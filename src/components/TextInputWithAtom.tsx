@@ -1,12 +1,10 @@
-import { TextInput } from "@mantine/core";
-import type { TextInputProps } from "@mantine/core";
-import { useAtom, type PrimitiveAtom } from "jotai";
+import { useAtom, type WritableAtom } from "jotai";
 
-type Props<T> = Omit<TextInputProps, "onChange"> & {
-	atom: PrimitiveAtom<T>;
+interface Props<T> extends Omit<React.ComponentPropsWithRef<'input'>, 'onChange'> {
+	atom: WritableAtom<T, [T], void>
 };
 
-export default function TextInputWithAtom<T extends string | number>(
+export default function InputWithAtom<T extends string | number>(
 	props: Props<T>,
 ) {
 	const { atom, type, ...rest } = props;
@@ -19,7 +17,7 @@ export default function TextInputWithAtom<T extends string | number>(
 
 	const newProps = { ...rest, value, onChange };
 
-	return <TextInput {...newProps} />;
+	return <input {...newProps} />;
 }
 
 const ensureNumber = (input: string): number => {

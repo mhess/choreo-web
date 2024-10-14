@@ -78,13 +78,13 @@ describe("Entry", () => {
 	it("It displays the correct count, timestamp, and note", () => {
 		arrange([exampleEntry], 0);
 
-		expect(screen.getByLabelText("count")).toHaveValue("5");
+		expect(screen.getByLabelText("Count")).toHaveValue("5");
 
 		expect(
 			screen.getByRole("button", { name: "Seek to 0:12.34" }),
 		).toBeInTheDocument();
 
-		expect(screen.getByLabelText("note")).toHaveValue("Note");
+		expect(screen.getByLabelText("Note")).toHaveValue("Note");
 
 		expect(
 			screen.queryByRole("button", {
@@ -106,7 +106,7 @@ describe("Entry", () => {
 	it("Correctly modifies the count", async () => {
 		arrange([exampleEntry], 0);
 
-		const countInput = screen.getByLabelText("count");
+		const countInput = screen.getByLabelText("Count");
 
 		await user.clear(countInput);
 		await user.type(countInput, "10");
@@ -140,7 +140,7 @@ describe("Entry", () => {
 		arrange([exampleEntry], 0);
 
 		const newValue = "New note";
-		const noteInput = screen.getByLabelText("note");
+		const noteInput = screen.getByLabelText("Note");
 		await user.clear(noteInput);
 		await user.type(noteInput, newValue);
 
@@ -239,7 +239,7 @@ describe("Entry", () => {
 			}),
 		).not.toBeInTheDocument();
 
-		const countInput = screen.getByLabelText("count");
+		const countInput = screen.getByLabelText("Count");
 
 		await user.clear(countInput);
 		await user.type(countInput, "2");

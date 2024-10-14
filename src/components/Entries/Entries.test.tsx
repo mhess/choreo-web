@@ -84,7 +84,7 @@ describe("Entries", () => {
 
 		const headers = within(headerRow).getAllByRole("columnheader");
 
-		["count", "timestamp", "note"].forEach((title, index) =>
+		["Count", "Timestamp", "Note"].forEach((title, index) =>
 			expect(headers[index]).toHaveTextContent(title),
 		);
 

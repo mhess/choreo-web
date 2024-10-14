@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
-import { Box, Group, Text } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
@@ -11,6 +11,9 @@ import Controls from "./Controls";
 import Entry from "./Entry";
 
 import classes from "./Entries.module.css";
+
+export const COUNT_LABEL = "Count";
+export const NOTE_LABEL = "Note";
 
 export default function Entries() {
 	const player = useEstablishedPlayer();
@@ -63,18 +66,28 @@ export default function Entries() {
 	);
 }
 
+const headerStyles = "text-sm leading-3 font-bold";
+const borderStyles =
+	"border-r border-solid border-gray-800 dark:border-gray-500";
+
 const EntryHeader = () => (
-	<Group className={classes.entryHeader} role="row">
-		<Text className={classes.count} role="columnheader">
-			count
-		</Text>
-		<Text className={classes.timestamp} role="columnheader">
-			timestamp
-		</Text>
-		<Text pl="sm" role="columnheader">
-			note
-		</Text>
-	</Group>
+	<div role="row" className="flex lowercase pl-4 py-2">
+		<span
+			role="columnheader"
+			className={`${headerStyles} ${borderStyles} w-16 text-right pr-2`}
+		>
+			{COUNT_LABEL}
+		</span>
+		<span
+			role="columnheader"
+			className={`${headerStyles} ${borderStyles} w-[5.5rem] text-center`}
+		>
+			Timestamp
+		</span>
+		<span role="columnheader" className={`${headerStyles} ml-2`}>
+			{NOTE_LABEL}
+		</span>
+	</div>
 );
 
 const setEntriesScrollPosition = (
