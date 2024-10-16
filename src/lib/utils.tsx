@@ -35,3 +35,8 @@ export const BreakpointProvider = ({ children }: React.PropsWithChildren) => {
 };
 
 export const useIsMobile = () => useContext(IsMobileContext);
+
+// Use this tagged literal function to annotate tailwind class strings
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const tw = (strings: ReadonlyArray<string>, ...values: any[]) =>
+	String.raw({ raw: strings }, ...values);

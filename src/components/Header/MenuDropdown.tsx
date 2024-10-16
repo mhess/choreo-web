@@ -1,10 +1,6 @@
 import { useRef, createElement, Fragment, type ReactElement } from "react";
-import {
-	Group,
-	Menu,
-	useComputedColorScheme,
-	useMantineColorScheme,
-} from "@mantine/core";
+import { useComputedColorScheme, useMantineColorScheme } from "@mantine/core";
+import { Menu, MenuItem, Popover, Separator } from "react-aria-components";
 import { useAtom } from "jotai";
 import { IconMoon, IconSun } from "@tabler/icons-react";
 
@@ -12,12 +8,11 @@ import { useIsMobile } from "~/lib/utils";
 import { platformAtom, playerAtom, trackNameAtom } from "~/lib/platformAtoms";
 import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
-
-import PlatformItems from "./PlatformItems";
-
-import classes from "./MenuDropdown.module.css";
 import { audioFileAtom } from "~/platforms/audioFile";
 import { entryAtomsForPlatformAtom } from "~/lib/entries";
+
+import PlatformItems from "./PlatformItems";
+import { menuStyles } from "./styles";
 
 export default function MenuDropdown() {
 	const [{ clearAtom, saveToCSVAtom, loadFromCSVAtom }] = useAtom(
@@ -58,39 +53,39 @@ export default function MenuDropdown() {
 
 	const entriesGroup = player && (
 		<Fragment key="entries">
-			<Menu.Item onClick={handleClickLoad}>Load entries from CSV</Menu.Item>
-			<Menu.Item onClick={handleSaveCSV}>Save entries to CSV</Menu.Item>
-			<Menu.Item onClick={clear}>Clear entries</Menu.Item>
+			<MenuItem onAction={handleClickLoad}>Load entries from CSV</MenuItem>
+			<MenuItem onAction={handleSaveCSV}>Save entries to CSV</MenuItem>
+			<MenuItem onAction={clear}>Clear entries</MenuItem>
 		</Fragment>
 	);
 
 	const platformGroup = isMobile && <PlatformItems key="platform" />;
 
 	const youTubeGroup = ytVideoId && platform === "youtube" && (
-		<Menu.Item key="change-yt" onClick={() => setYtVideoId(null)}>
+		<MenuItem key="change-yt" onAction={() => setYtVideoId(null)}>
 			Change YouTube Video
-		</Menu.Item>
+		</MenuItem>
 	);
 
 	const spotifyLogoutGroup = isSpotifyLoggedIn && platform === "spotify" && (
-		<Menu.Item key="log-out" onClick={logoutSpotify}>
+		<MenuItem key="log-out" onAction={logoutSpotify}>
 			Log out of Spotify
-		</Menu.Item>
+		</MenuItem>
 	);
 
 	const audioFileGroup = player && platform === "audioFile" && (
-		<Menu.Item key="change-file" onClick={() => setAudioFile()}>
+		<MenuItem key="change-file" onAction={() => setAudioFile()}>
 			Change Audio File
-		</Menu.Item>
+		</MenuItem>
 	);
 
 	const lightDarkGroup = isMobile && (
-		<Menu.Item key="color-scheme" onClick={toggleColorScheme}>
-			<Group gap="0.25rem">
+		<MenuItem key="color-scheme" onAction={toggleColorScheme}>
+			<div className="flex gap-1">
 				{createElement(isLight ? IconSun : IconMoon, { size: "1.25rem" })}
 				Toggle light/dark
-			</Group>
-		</Menu.Item>
+			</div>
+		</MenuItem>
 	);
 
 	const groupsToRender = [
@@ -107,7 +102,7 @@ export default function MenuDropdown() {
 			output.push(el);
 			if (index < groups.length - 1)
 				// biome-ignore lint/suspicious/noArrayIndexKey: an element with the same key will be the same element
-				output.push(<Menu.Divider key={`div-${index}`} />);
+				output.push(<Separator key={`div-${index}`} />);
 			return output;
 		},
 		[] as ReactElement[],
@@ -117,7 +112,7 @@ export default function MenuDropdown() {
 		<>
 			{/* This input must still be rendered even after the menu dropdown closes
 			  in order for the onChange callback to get invoked */}
-			<label htmlFor="csv-upload" className={classes.fileInputLabel}>
+			<label htmlFor="csv-upload" className="hidden">
 				Upload CSV
 				<input
 					id="csv-upload"
@@ -126,7 +121,9 @@ export default function MenuDropdown() {
 					onChange={handleLoadCSV}
 				/>
 			</label>
-			<Menu.Dropdown>{groupsWithDividers}</Menu.Dropdown>
+			<Popover>
+				<Menu className={menuStyles}>{groupsWithDividers}</Menu>
+			</Popover>
 		</>
 	);
 }
