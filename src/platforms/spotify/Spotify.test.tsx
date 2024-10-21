@@ -73,6 +73,7 @@ describe("Spotify", () => {
 		vi.useRealTimers();
 		vi.restoreAllMocks();
 		localStorage.clear();
+		document.body.innerHTML = "";
 	});
 
 	it("Renders log in screen when not logged in", async () => {
@@ -142,7 +143,7 @@ describe("Spotify", () => {
 			{ wrapper },
 		);
 
-		screen.getByText("Connecting to Spotify");
+		expect(screen.getByText("Connecting to Spotify")).toBeInTheDocument();
 
 		rerender(
 			<SpotifyComponent token={null}>
@@ -150,7 +151,7 @@ describe("Spotify", () => {
 			</SpotifyComponent>,
 		);
 
-		screen.getByText("Connecting to Spotify");
+		expect(screen.getByText("Connecting to Spotify")).toBeInTheDocument();
 
 		window.onSpotifyWebPlaybackSDKReady();
 

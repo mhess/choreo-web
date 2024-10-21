@@ -1,6 +1,6 @@
 import { useRef, createElement, Fragment, type ReactElement } from "react";
 import { useComputedColorScheme, useMantineColorScheme } from "@mantine/core";
-import { Menu, MenuItem, Popover, Separator } from "react-aria-components";
+import { Menu, Popover, Separator } from "react-aria-components";
 import { useAtom } from "jotai";
 import { IconMoon, IconSun } from "@tabler/icons-react";
 
@@ -10,6 +10,7 @@ import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
 import { audioFileAtom } from "~/platforms/audioFile";
 import { entryAtomsForPlatformAtom } from "~/lib/entries";
+import MenuItem from "~/components/MenuItem";
 
 import PlatformItems from "./PlatformItems";
 import { menuStyles } from "./styles";
@@ -102,7 +103,12 @@ export default function MenuDropdown() {
 			output.push(el);
 			if (index < groups.length - 1)
 				// biome-ignore lint/suspicious/noArrayIndexKey: an element with the same key will be the same element
-				output.push(<Separator key={`div-${index}`} />);
+				output.push(
+					<Separator
+						key={`div-${index}`}
+						className="my-1 border-t border-slate-300 dark:border-slate-400"
+					/>,
+				);
 			return output;
 		},
 		[] as ReactElement[],

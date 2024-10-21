@@ -1,12 +1,13 @@
-import { Header, MenuItem, Section } from "react-aria-components";
+import { Header, Section } from "react-aria-components";
 import { useAtom } from "jotai";
 
 import { type Platform, platformAtom } from "~/lib/platformAtoms";
-
-import { AudioFile, Spotify, YouTube } from "../Logos";
+import MenuItem from "~/components/MenuItem";
 import { tw } from "~/lib/utils";
 
-const itemStyles = tw`mb-1 flex items-center gap-2 text-sm last:mb-0`;
+import { AudioFile, Spotify, YouTube } from "../Logos";
+
+const logoStyles = tw`flex w-7 justify-center`;
 
 export default function PlatformItems() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -15,27 +16,21 @@ export default function PlatformItems() {
 		<Section>
 			<Header className="mb-2 text-xs">Switch to</Header>
 			{platform !== "spotify" && (
-				<MenuItem
-					className={itemStyles}
-					onAction={() => setPlatform("spotify")}
-				>
-					{logoByPlatform.spotify} {labelByPlatform.spotify}
+				<MenuItem onAction={() => setPlatform("spotify")}>
+					<span className={logoStyles}>{logoByPlatform.spotify}</span>
+					{labelByPlatform.spotify}
 				</MenuItem>
 			)}
 			{platform !== "youtube" && (
-				<MenuItem
-					className={itemStyles}
-					onAction={() => setPlatform("youtube")}
-				>
-					{logoByPlatform.youtube} {labelByPlatform.youtube}
+				<MenuItem onAction={() => setPlatform("youtube")}>
+					<span className={logoStyles}>{logoByPlatform.youtube}</span>
+					{labelByPlatform.youtube}
 				</MenuItem>
 			)}
 			{platform !== "audioFile" && (
-				<MenuItem
-					className={itemStyles}
-					onAction={() => setPlatform("audioFile")}
-				>
-					{logoByPlatform.audioFile} {labelByPlatform.audioFile}
+				<MenuItem onAction={() => setPlatform("audioFile")}>
+					<span className={logoStyles}>{logoByPlatform.audioFile}</span>
+					{labelByPlatform.audioFile}
 				</MenuItem>
 			)}
 		</Section>
