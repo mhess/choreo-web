@@ -8,16 +8,42 @@
 	:root,
 	body,
 	#root {
-		@apply h-full;
+		height: 100%;
 	}
 
 	#root {
-		@apply flex-col;
+		display: flex;
+		flex-direction: column;
+	}
+
+	input {
+		@apply outline-none focus-visible:outline-cyan-700 dark:focus-visible:outline-orange-400;
+	}
+
+	button,
+	[role="menuitem"] {
+		@apply outline-none data-[focus-visible]:outline-cyan-700 dark:data-[focus-visible]:outline-orange-400;
+	}
+
+	input {
+		@apply bg-zinc-50 dark:bg-gray-800;
 	}
 }
 
-@tailwind components;
+/* @tailwind components; */
 @tailwind utilities;
+
+.react-aria-ModalOverlay {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: var(--visual-viewport-height);
+	background-color: rgba(0, 0, 0, 0.5);
+}
 
 :root {
 	--app-font-color: var(--mantine-color-gray-9);

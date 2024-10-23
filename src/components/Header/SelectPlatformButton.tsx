@@ -1,21 +1,20 @@
 import { useAtom } from "jotai";
-import { Menu, MenuTrigger, Popover } from "react-aria-components";
+import { Menu, MenuTrigger, Popover, Button } from "react-aria-components";
 
 import { platformAtom } from "~/lib/platformAtoms";
-import Button from "~/components/Button";
+import { menuButtonStyles, menuStyles } from "~/styles";
 
 import PlatformItems, {
 	logoByPlatform,
 	labelByPlatform,
 } from "./PlatformItems";
-import { menuButtonStyles, menuStyles } from "./styles";
 
 export default function SelectPlatformButton() {
 	const [platform] = useAtom(platformAtom);
 
 	return (
 		<MenuTrigger>
-			<Button className={menuButtonStyles}>
+			<Button className={`${menuButtonStyles} px-2 py-1 text-sm`}>
 				{logoByPlatform[platform]}
 				{labelByPlatform[platform]}
 			</Button>
