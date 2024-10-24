@@ -1,16 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { Box } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { setOnIndexChangeAtom, useEntryAtoms } from "~/lib/entries";
+import { tw } from "~/lib/utils";
 
 import Help from "./Help";
 import Controls from "./Controls";
 import Entry from "./Entry";
-
-import classes from "./Entries.module.css";
 
 export const COUNT_LABEL = "Count";
 export const NOTE_LABEL = "Note";
@@ -26,7 +23,8 @@ export default function Entries() {
 	const [, setCurrentIndexForTime] = useAtom(currentIndexAtom);
 	const [entries] = useAtom(entriesAtom);
 
-	const [isHelpOpen, { toggle }] = useDisclosure(false);
+	const [isHelpOpen, setIsHelpOpen] = useState(false);
+	const toggle = () => setIsHelpOpen((prev) => !prev);
 
 	useEffect(() => {
 		setCallback((index) =>
@@ -44,23 +42,22 @@ export default function Entries() {
 	return (
 		<>
 			{isHelpOpen && <EntryHeader />}
-			<Box
+			<div
 				role="region"
 				aria-label="Entries"
-				className={classes.entries}
-				pb={isHelpOpen ? 0 : "2rem"}
+				className={`relative flex-1 overflow-y-auto ${isHelpOpen ? "" : tw`pb-8`}`}
 				ref={scrollerRef}
 			>
 				{!isHelpOpen && <EntryHeader />}
-				<Box ref={containerRef}>
+				<div ref={containerRef}>
 					{entries.map((entry, index) => (
 						<Entry key={entry.timeMs} entry={entry} index={index} />
 					))}
-				</Box>
+				</div>
 				{isHelpOpen && (
 					<Help scrollerRef={scrollerRef} containerRef={containerRef} />
 				)}
-			</Box>
+			</div>
 			<Controls help={{ isShowing: isHelpOpen, toggle }} />
 		</>
 	);

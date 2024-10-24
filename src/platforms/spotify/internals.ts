@@ -9,7 +9,7 @@ import { PlatformPlayer, getPlatformAtoms } from "~/lib/player";
 
 declare global {
 	interface Window {
-		spotifyPromise: Promise<SpotifyPlayer>;
+		spotifyPromise?: Promise<SpotifyPlayer>;
 	}
 }
 export enum SpotifyPlayerStatus {
@@ -97,15 +97,18 @@ const getSpotifyPlayer = async (
 	setState: (state: Spotify.PlaybackState | null) => void,
 	setStatus: (status: SpotifyPlayerStatus) => void,
 ): Promise<SpotifyPlayer> => {
-	if (!document.getElementById(SPOTIFY_SCRIPT_ID)) {
+	if (window.spotifyPromise) return window.spotifyPromise;
+	const isTokenFake = token === "fake";
+
+	if (!isTokenFake) {
 		const $script = document.createElement("script");
 		$script.id = SPOTIFY_SCRIPT_ID;
 		$script.src = "https://sdk.scdn.co/spotify-player.js";
 		document.body.appendChild($script);
-	} else return window.spotifyPromise;
+	}
 
 	window.spotifyPromise = new Promise<Spotify.Player>((resolve) => {
-		if (token === "fake")
+		if (isTokenFake)
 			return resolve(
 				new FakeSpotifyPlayer({
 					name: "Choreo Player",

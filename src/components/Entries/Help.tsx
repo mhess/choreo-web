@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { Container, Stack, Text, Box } from "@mantine/core";
 import { IconCornerLeftUp, IconPlaylistAdd } from "@tabler/icons-react";
 
-import { useIsMobile } from "~/lib/utils";
-
-import classes from "./Help.module.css";
+import { tw, useIsMobile } from "~/lib/utils";
 
 const desktoControlsHelp = (
 	<>
@@ -20,10 +17,17 @@ const mobileControlsHelp = (
 	</>
 );
 
-export default function Help({
-	scrollerRef,
-	containerRef,
-}: { scrollerRef: ElementRef; containerRef: ElementRef }) {
+const helpSectionStyles = tw`max-w-7xl justify-center bg-yellow-400 px-4 py-2 text-sm dark:bg-orange-500`;
+const termStyles = tw`font-bold italic`;
+const defStyles = tw`ml-4`;
+
+interface HelpProps {
+	scrollerRef: ElementRef;
+	containerRef: ElementRef;
+}
+
+export default function Help(props: HelpProps) {
+	const { scrollerRef, containerRef } = props;
 	const isMobile = useIsMobile();
 	const [entryHeight, setEntryHeight] = useState(0);
 
@@ -35,62 +39,65 @@ export default function Help({
 	}, [scrollerRef.current, containerRef.current]);
 
 	return (
-		<Stack className={classes.help} h={`calc(100% - ${entryHeight}px)`}>
-			<Container size="sm" className={classes.helpSection}>
-				<Text>
-					<IconCornerLeftUp width="1.25rem" /> The row above is an <b>entry</b>,
-					which has a <b>count</b>, <b>timestamp</b>, and <b>note</b>.
-				</Text>
-				<dl className={classes.definitions}>
-					<Box>
-						<dt>Entry</dt>
-						<dd>
+		<div
+			className="mx-4 flex flex-col items-center justify-between gap-4 overflow-y-auto"
+			style={{ height: `calc(100% - ${entryHeight}px)` }}
+		>
+			<div
+				className={`${helpSectionStyles} shrink flex-col gap-2 rounded-b-lg pb-4`}
+			>
+				<p>
+					<IconCornerLeftUp width="1.25rem" className="inline align-sub" /> The
+					row above is an <b>entry</b>, which has a <b>count</b>,{" "}
+					<b>timestamp</b>, and <b>note</b>.
+				</p>
+				<dl className="mt-2 flex flex-col gap-2">
+					<div>
+						<dt className={termStyles}>Entry</dt>
+						<dd className={defStyles}>
 							An annotation assigned to specific time point in the playing
 							track.
 						</dd>
-					</Box>
-					<Box>
-						<dt>Count</dt>
-						<dd>
+					</div>
+					<div>
+						<dt className={termStyles}>Count</dt>
+						<dd className={defStyles}>
 							The number of user-specified measures/meters that have ellapsed at
 							the timestamp for the entry. If you fill in the count values for
 							the last two entries, all subsequently added entries will have
 							their count values automatically generated based on the durations
 							of the previous counts.
 						</dd>
-					</Box>
-					<Box>
-						<dt>Timestamp</dt>
-						<dd>
-							The time which the entry is annotating. Clicking on an entry's
-							timestamp will seek to that point in the track.
+					</div>
+					<div>
+						<dt className={termStyles}>Timestamp</dt>
+						<dd className={defStyles}>
+							The time which the entry is annotating. Clicking on an
+							entry&apos;s timestamp will seek to that point in the track.
 						</dd>
-					</Box>
-					<Box>
-						<dt>Note</dt>
-						<dd>
+					</div>
+					<div>
+						<dt className={termStyles}>Note</dt>
+						<dd className={defStyles}>
 							Whatever text you want to annotate that timestamp in a tack. For
 							example, a dance pattern that should occur at that time.
 						</dd>
-					</Box>
+					</div>
 				</dl>
-			</Container>
-			<Container size="sm" className={classes.helpSection}>
-				<Box>
-					<Text mb="xs">
+			</div>
+			<div className={`${helpSectionStyles} items-end rounded-t-lg pt-4`}>
+				<div>
+					<p className="mb-4">
 						{isMobile ? mobileControlsHelp : desktoControlsHelp}
-					</Text>
-					<Text>
+					</p>
+					<p>
 						The <b>Add Entry</b>{" "}
-						<IconPlaylistAdd
-							width="1.25rem"
-							style={{ verticalAlign: "middle" }}
-						/>{" "}
-						button will add an entry at the current track time—even while the
-						track is playing.
-					</Text>
-				</Box>
-			</Container>
-		</Stack>
+						<IconPlaylistAdd width="1.25rem" className="inline" /> button will
+						add an entry at the current track time—even while the track is
+						playing.
+					</p>
+				</div>
+			</div>
+		</div>
 	);
 }
