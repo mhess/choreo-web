@@ -1,63 +1,41 @@
 :root[data-mantine-color-scheme="dark"] {
-  .controlBar {
-    background-color: var(--app-bg-color-dark);
-    border-top-color: var(--app-border-color-dark);
-  }
+	.controlBar {
+		background-color: var(--app-bg-color-dark);
+		border-top-color: var(--app-border-color-dark);
+	}
 
-  .timeDisplay {
-    background-color: var(--mantine-color-dark-7);
-  }
+	.timeDisplay {
+		background-color: var(--mantine-color-dark-7);
+	}
 
-  .btnLabel :global(.material-symbols-outlined) {
-    color: var(--app-font-color-dark);
-  }
-}
-
-.controlBar {
-  padding: 0.5em 1rem;
-  background-color: var(--app-bg-color);
-  border-top: 1px solid var(--app-border-color);
-
-  @media screen and (min-width: $mobile-breakpoint) {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  @media screen and (max-width: $mobile-breakpoint) {
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 0.75rem;
-  }
-}
-
-.desktopLeftSide {
-  gap: 0.25em;
+	.btnLabel :global(.material-symbols-outlined) {
+		color: var(--app-font-color-dark);
+	}
 }
 
 .timeDisplay {
-  font-family: monospace;
-  font-size: var(--mantine-font-size-sm);
-  text-align: right;
-  padding: 0 0.5rem;
-  background-color: white;
-  margin-right: 0.5rem;
-  width: 5.5rem;
-  line-height: 2;
-  border-radius: var(--mantine-radius-default);
+	font-family: monospace;
+	font-size: var(--mantine-font-size-sm);
+	text-align: right;
+	padding: 0 0.5rem;
+	background-color: white;
+	margin-right: 0.5rem;
+	width: 5.5rem;
+	line-height: 2;
+	border-radius: var(--mantine-radius-default);
 
-  @media screen and (max-width: $mobile-breakpoint) {
-    margin: 0;
-  }
+	@media screen and (max-width: $mobile-breakpoint) {
+		margin: 0;
+	}
 }
 
 .helpTooltip {
-  font-size: var(--mantine-font-size-sm);
-  animation: blinking 1s linear infinite;
+	font-size: var(--mantine-font-size-sm);
+	animation: blinking 1s linear infinite;
 }
 
 @keyframes blinking {
-  50% {
-    filter: brightness(130%);
-  }
+	50% {
+		filter: brightness(130%);
+	}
 }

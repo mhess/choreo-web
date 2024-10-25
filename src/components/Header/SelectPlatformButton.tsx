@@ -14,7 +14,7 @@ export default function SelectPlatformButton() {
 
 	return (
 		<MenuTrigger>
-			<Button className={`${menuButtonStyles} px-2 py-1 text-sm`}>
+			<Button className={`${menuButtonStyles} gap-2 px-2 py-1 text-sm`}>
 				{logoByPlatform[platform]}
 				{labelByPlatform[platform]}
 			</Button>

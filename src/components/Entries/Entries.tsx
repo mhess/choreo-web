@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
+import clsx from "clsx";
 
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { setOnIndexChangeAtom, useEntryAtoms } from "~/lib/entries";
-import { tw } from "~/lib/utils";
 
+import { COUNT_LABEL, countWidth, NOTE_LABEL } from "./shared";
 import Help from "./Help";
 import Controls from "./Controls";
 import Entry from "./Entry";
-
-export const COUNT_LABEL = "Count";
-export const NOTE_LABEL = "Note";
+import { tw } from "~/lib/utils";
 
 export default function Entries() {
 	const player = useEstablishedPlayer();
@@ -45,7 +44,10 @@ export default function Entries() {
 			<div
 				role="region"
 				aria-label="Entries"
-				className={`relative flex-1 overflow-y-auto ${isHelpOpen ? "" : tw`pb-8`}`}
+				className={clsx(
+					!isHelpOpen && "pb-8",
+					"relative flex-1 overflow-y-auto",
+				)}
 				ref={scrollerRef}
 			>
 				{!isHelpOpen && <EntryHeader />}
@@ -63,25 +65,33 @@ export default function Entries() {
 	);
 }
 
-const headerStyles = "text-sm leading-3 font-bold";
-const borderStyles =
-	"border-r border-solid border-gray-800 dark:border-gray-500";
+const textStyles = tw`text-sm font-bold leading-3`;
+const borderStyles = tw`border-r border-solid border-gray-800 dark:border-gray-500`;
+
+const countStyles = clsx(
+	textStyles,
+	borderStyles,
+	countWidth,
+	"pr-2 text-right",
+);
+
+const timestampStyles = clsx(
+	textStyles,
+	borderStyles,
+	"w-[5.5rem] text-center",
+);
+
+const noteStyles = clsx(textStyles, "ml-2");
 
 const EntryHeader = () => (
 	<div role="row" className="flex py-2 pl-4 lowercase">
-		<span
-			role="columnheader"
-			className={`${headerStyles} ${borderStyles} w-16 pr-2 text-right`}
-		>
+		<span role="columnheader" className={countStyles}>
 			{COUNT_LABEL}
 		</span>
-		<span
-			role="columnheader"
-			className={`${headerStyles} ${borderStyles} w-[5.5rem] text-center`}
-		>
+		<span role="columnheader" className={timestampStyles}>
 			Timestamp
 		</span>
-		<span role="columnheader" className={`${headerStyles} ml-2`}>
+		<span role="columnheader" className={noteStyles}>
 			{NOTE_LABEL}
 		</span>
 	</div>

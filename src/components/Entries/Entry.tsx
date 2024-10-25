@@ -13,11 +13,10 @@ import { IconArrowMoveDown, IconX } from "@tabler/icons-react";
 import { displayMs } from "~/lib/utils";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { entryAtomsForPlatformAtom, type AtomicEntry } from "~/lib/entries";
-import { COUNT_LABEL, NOTE_LABEL } from "./Entries";
-
 import InputWithAtom from "~/components/TextInputWithAtom";
-
 import { menuStyles } from "~/styles";
+
+import { COUNT_LABEL, NOTE_LABEL } from "./shared";
 
 export default function Entry(props: { entry: AtomicEntry; index: number }) {
 	const { entry, index } = props;
@@ -99,7 +98,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 					</DialogTrigger>
 				) : undefined}
 				<InputWithAtom
-					className="w-16 rounded px-2 py-0.5 text-right"
+					className="w-12 rounded px-2 py-0.5 text-right"
 					aria-label={COUNT_LABEL}
 					type="number"
 					atom={countAtom}
@@ -113,7 +112,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 				{displayTime}
 			</Button>
 			<InputWithAtom
-				className="mr-2 flex-1 rounded px-2 py-0.5"
+				className="mr-2 min-w-0 flex-1 rounded px-2 py-0.5"
 				aria-label={NOTE_LABEL}
 				atom={noteAtom}
 			/>

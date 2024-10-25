@@ -39,7 +39,7 @@ export default function Landing() {
 						onPress={() => selectPlatform("spotify")}
 					>
 						<span>Use Spotify Premium</span>
-						<Spotify height="1.25rem" />
+						<Spotify />
 					</Button>
 					<Button
 						className={`${btnStyles} gap-2`}

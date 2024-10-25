@@ -1,18 +1,37 @@
-import { Tooltip } from "@mantine/core";
-import type { TooltipProps } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import {
+	Dialog,
+	DialogTrigger,
+	Popover,
+	Tooltip,
+	TooltipTrigger,
+} from "react-aria-components";
 
-export default function TooltipWithClick(props: TooltipProps) {
-	const [isOpen, { open, close, toggle }] = useDisclosure(false);
+import { useIsMobile } from "~/lib/utils";
+import { menuStyles } from "~/styles";
 
-	const newProps = { ...props };
+interface Props extends React.PropsWithChildren {
+	tooltip: React.ReactNode;
+}
 
-	if (newProps.opened === undefined) {
-		newProps.onMouseEnter = open;
-		newProps.onMouseLeave = close;
-		newProps.onClick = toggle;
-		newProps.opened = isOpen;
-	}
+export default function TooltipWithClick(props: Props) {
+	const { tooltip, children } = props;
+	const isMobile = useIsMobile();
 
-	return <Tooltip {...newProps} />;
+	return isMobile ? (
+		<DialogTrigger>
+			{children}
+			<Popover offset={8}>
+				<Dialog className={`${menuStyles} max-w-xs`}>
+					<p>{tooltip}</p>
+				</Dialog>
+			</Popover>
+		</DialogTrigger>
+	) : (
+		<TooltipTrigger delay={0}>
+			{children}
+			<Tooltip className={`${menuStyles} max-w-xs`} offset={8}>
+				{tooltip}
+			</Tooltip>
+		</TooltipTrigger>
+	);
 }

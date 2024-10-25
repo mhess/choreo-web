@@ -40,7 +40,7 @@ export default function Help(props: HelpProps) {
 
 	return (
 		<div
-			className="mx-4 flex flex-col items-center justify-between gap-4 overflow-y-auto"
+			className="flex flex-col items-center justify-between gap-4 overflow-y-auto px-4"
 			style={{ height: `calc(100% - ${entryHeight}px)` }}
 		>
 			<div
