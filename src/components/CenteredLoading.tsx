@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import { Center } from "@mantine/core";
 import Loading from "./Loading";
 
 export default function CenteredLoading({ message }: { message: ReactNode }) {
 	return (
-		<Center h="100%">
+		<div className="flex h-full items-center justify-center">
 			<Loading message={message} />
-		</Center>
+		</div>
 	);
 }

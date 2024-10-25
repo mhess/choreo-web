@@ -42,11 +42,11 @@ export default function Header() {
 		(platform === "youtube" && !!ytVideoId);
 
 	return (
-		<header className="flex items-center border-b border-slate-800 bg-emerald-50 px-4 py-1 dark:border-slate-500 dark:bg-teal-900">
+		<header className="flex items-center border-b border-slate-800 bg-teal-50 px-4 py-1 dark:border-slate-500 dark:bg-teal-900">
 			<div className="flex min-w-0 flex-nowrap items-center gap-4">
 				<Button
 					onPress={() => setPlatform("landing")}
-					className="p-2 text-lg font-bold uppercase text-violet-900 dark:text-purple-300"
+					className="p-2 text-lg font-bold uppercase text-violet-700 dark:text-violet-500 dark:brightness-200"
 				>
 					Choreo
 				</Button>

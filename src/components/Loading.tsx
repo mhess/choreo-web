@@ -1,10 +1,8 @@
-import { Loader, Stack } from "@mantine/core";
-
 export default function Loading({ message }: { message: React.ReactNode }) {
 	return (
-		<Stack align="center">
-			<Loader color="var(--mantine-color-gray-7)" />
+		<div className="flex flex-col items-center justify-center">
+			<p className="text-zinc-500">loading</p>
 			{message}
-		</Stack>
+		</div>
 	);
 }

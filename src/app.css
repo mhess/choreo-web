@@ -22,7 +22,7 @@
 
 	button,
 	[role="menuitem"] {
-		@apply outline-none data-[focus-visible]:outline-cyan-700 dark:data-[focus-visible]:outline-orange-400;
+		@apply outline-none data-[focus-visible]:outline-blue-700 dark:data-[focus-visible]:outline-orange-400;
 	}
 
 	input {
