@@ -1,6 +1,4 @@
-import { useMantineTheme } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 export const displayMs = (totalMs: number) => {
 	const ms = (totalMs % 1000).toString().slice(0, 2).padStart(2, "0");
@@ -21,11 +19,35 @@ export const debounced = (fn: (...rest: any[]) => void, timeMs: number) => {
 	};
 };
 
+const darkClassName = "dark";
+
+const getIsDark = () =>
+	document.documentElement.classList.contains(darkClassName);
+
+const toggleColorScheme = () => {
+	const isDark = getIsDark();
+	document.documentElement.classList.toggle(darkClassName);
+	localStorage.theme = isDark ? "light" : darkClassName;
+};
+
+export const useColorScheme = () => {
+	const isDark = getIsDark();
+	return { isDark, toggle: toggleColorScheme };
+};
+
 export const IsMobileContext = createContext(false);
 
+const media = window.matchMedia("(max-width: 36rem)");
+
 export const BreakpointProvider = ({ children }: React.PropsWithChildren) => {
-	const { mobile } = useMantineTheme().breakpoints;
-	const isMobile = !!useMediaQuery(`(max-width: ${mobile})`);
+	const [isMobile, setMatches] = useState(media.matches);
+
+	useEffect(() => {
+		const listener = () => setMatches(media.matches);
+		media.addEventListener("change", listener);
+
+		return () => media.removeEventListener("change", listener);
+	}, []);
 
 	return (
 		<IsMobileContext.Provider value={isMobile}>

@@ -1,4 +1,12 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
+import {
+	describe,
+	it,
+	expect,
+	vi,
+	beforeEach,
+	type Mock,
+	afterEach,
+} from "vitest";
 import {
 	act,
 	render,
@@ -16,7 +24,6 @@ import type { PlatformPlayer } from "~/lib/player";
 import { withStore } from "~/test/utils";
 
 import Entries from "./Entries";
-import Help from "./Help";
 
 vi.mock("./Entry", () => ({
 	default: ({ entry, index }: { entry: AtomicEntry; index: number }) => {
@@ -33,7 +40,7 @@ vi.mock("./Entry", () => ({
 }));
 
 vi.mock("./Help", () => ({
-	default: ({ entry }: { entry: AtomicEntry }) => <div data-testid="help" />,
+	default: () => <div data-testid="help" />,
 }));
 
 describe("Entries", () => {
@@ -55,6 +62,11 @@ describe("Entries", () => {
 
 		const { playerAtom } = getAtoms(platform);
 		setAtoms([[playerAtom, player]]);
+		localStorage.autoHelp = true;
+	});
+
+	afterEach(() => {
+		localStorage.clear();
 	});
 
 	const getRenderedEntryValues = () =>
@@ -423,10 +435,14 @@ describe("Entries", () => {
 		// Using this less efficient query bc it's the same used to assert element
 		// not rendered.
 		const findTooltip = () =>
-			waitFor(() => screen.getByRole("tooltip", { name: /^First time/ }), {
-				interval: 10,
-				timeout: 30,
-			});
+			waitFor(
+				() =>
+					expect(screen.getByRole("dialog")).toHaveTextContent(/^First time/),
+				{
+					interval: 10,
+					timeout: 30,
+				},
+			);
 
 		await findTooltip();
 

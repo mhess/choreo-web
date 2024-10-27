@@ -1,10 +1,9 @@
 import { useRef, createElement, Fragment, type ReactElement } from "react";
-import { useComputedColorScheme, useMantineColorScheme } from "@mantine/core";
 import { Menu, Popover, Separator } from "react-aria-components";
 import { useAtom } from "jotai";
 import { IconMoon, IconSun } from "@tabler/icons-react";
 
-import { useIsMobile } from "~/lib/utils";
+import { useIsMobile, useColorScheme } from "~/lib/utils";
 import { platformAtom, playerAtom, trackNameAtom } from "~/lib/platformAtoms";
 import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
@@ -30,8 +29,7 @@ export default function MenuDropdown() {
 	const [trackName] = useAtom(trackNameAtom);
 	const [platform] = useAtom(platformAtom);
 	const [player] = useAtom(playerAtom);
-	const { toggleColorScheme } = useMantineColorScheme();
-	const isLight = useComputedColorScheme() === "light";
+	const { isDark, toggle: toggleColorScheme } = useColorScheme();
 	const isMobile = useIsMobile();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,7 +81,7 @@ export default function MenuDropdown() {
 	const lightDarkGroup = isMobile && (
 		<MenuItem key="color-scheme" onAction={toggleColorScheme}>
 			<div className="flex gap-1">
-				{createElement(isLight ? IconSun : IconMoon, { size: "1.25rem" })}
+				{createElement(isDark ? IconMoon : IconSun, { size: "1.25rem" })}
 				Toggle light/dark
 			</div>
 		</MenuItem>

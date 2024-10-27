@@ -3,7 +3,7 @@ import { IconCornerLeftUp, IconPlaylistAdd } from "@tabler/icons-react";
 
 import { tw, useIsMobile } from "~/lib/utils";
 
-const desktoControlsHelp = (
+const desktopControlsHelp = (
 	<>
 		From left to right, the control bar below has the <b>current track time</b>,{" "}
 		<b>playback buttons</b>, and the <b>Add Entry</b> button.
@@ -17,7 +17,7 @@ const mobileControlsHelp = (
 	</>
 );
 
-const helpSectionStyles = tw`max-w-7xl justify-center bg-yellow-400 px-4 py-2 text-sm dark:bg-orange-500`;
+const helpSectionStyles = tw`max-w-7xl justify-center bg-amber-300 px-4 py-2 text-sm dark:bg-orange-400`;
 const termStyles = tw`font-bold italic`;
 const defStyles = tw`ml-4`;
 
@@ -88,7 +88,7 @@ export default function Help(props: HelpProps) {
 			<div className={`${helpSectionStyles} items-end rounded-t-lg pt-4`}>
 				<div>
 					<p className="mb-4">
-						{isMobile ? mobileControlsHelp : desktoControlsHelp}
+						{isMobile ? mobileControlsHelp : desktopControlsHelp}
 					</p>
 					<p>
 						The <b>Add Entry</b>{" "}

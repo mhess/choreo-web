@@ -1,4 +1,3 @@
-import { createTheme, MantineProvider } from "@mantine/core";
 import { type WritableAtom, createStore, Provider } from "jotai";
 import type { PropsWithChildren } from "react";
 import { beforeEach } from "vitest";
@@ -12,7 +11,7 @@ import { IsMobileContext } from "~/lib/utils";
 
 // See https://github.com/pmndrs/jotai/discussions/2650 for more info on the typing here
 
-// biome-ignore lint/suspicious/noExplicitAny: Need to allow any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyWritableAtom = WritableAtom<unknown, any[], unknown>;
 type AtomsAndValues = Array<readonly [AnyWritableAtom, unknown]>;
 
@@ -30,9 +29,7 @@ export const withStore = () => {
 		isMobile = false,
 	}: PropsWithChildren<{ isMobile?: boolean }>) => (
 		<IsMobileContext.Provider value={isMobile}>
-			<Provider store={store}>
-				<MantineProvider theme={createTheme({})}>{children}</MantineProvider>
-			</Provider>
+			<Provider store={store}>{children}</Provider>
 		</IsMobileContext.Provider>
 	);
 

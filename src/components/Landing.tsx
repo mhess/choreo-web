@@ -17,7 +17,7 @@ export default function Landing() {
 			className={`flex w-full justify-center overflow-y-auto ${isMobile ? "items-start pt-4" : ""}`}
 		>
 			<div className="m-4 mt-8 flex w-full max-w-3xl flex-col gap-4 text-center">
-				<h3 className="text-4xl font-bold">Welcome to the Choreo App!</h3>
+				<h3 className="text-4xl font-bold">Welcome to the Choreo&nbsp;App!</h3>
 				<p>Choreo is an app that helps you compose choreography to music.</p>
 				<p>
 					The app can use audio from <b>Youtube,</b> a <b>Spotify</b> premium

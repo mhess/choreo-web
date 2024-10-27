@@ -6,18 +6,18 @@ import {
 	TooltipTrigger,
 } from "react-aria-components";
 
-import { useIsMobile } from "~/lib/utils";
 import { menuStyles } from "~/styles";
 
 interface Props extends React.PropsWithChildren {
 	tooltip: React.ReactNode;
 }
 
+const isTouchDevice = window.ontouchstart || navigator.maxTouchPoints > 0;
+
 export default function TooltipWithClick(props: Props) {
 	const { tooltip, children } = props;
-	const isMobile = useIsMobile();
 
-	return isMobile ? (
+	return isTouchDevice ? (
 		<DialogTrigger>
 			{children}
 			<Popover offset={8}>

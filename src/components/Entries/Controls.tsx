@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { Tooltip } from "@mantine/core";
 import {
 	IconHelp,
 	IconPlayerPause,
@@ -8,8 +7,9 @@ import {
 	IconPlaylistAdd,
 	IconRewindBackward5,
 	IconRewindForward5,
+	IconX,
 } from "@tabler/icons-react";
-import { Button } from "react-aria-components";
+import { Button, Dialog, DialogTrigger, Popover } from "react-aria-components";
 import clsx from "clsx";
 
 import type { OnTickCallback } from "~/lib/player";
@@ -18,8 +18,6 @@ import { playerPausedAtom, useEstablishedPlayer } from "~/lib/platformAtoms";
 import { entryAtomsForPlatformAtom } from "~/lib/entries";
 import { ctlBarStyles, menuButtonStyles } from "~/styles";
 import TooltipWithClick from "~/components/TooltipWithClick";
-
-import classes from "./Controls.module.css";
 
 const ctlBtnStyles = tw`rounded border border-zinc-600 bg-slate-50 hover:brightness-[98%] dark:bg-slate-800 dark:hover:brightness-110`;
 
@@ -89,9 +87,13 @@ const LS_NO_HELP_KEY = "autoHelp";
 const HelpButton = ({ help }: { help: Help }) => {
 	const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
-	const handleClick = () => {
+	const closeTooltip = () => {
 		if (isTooltipOpen) localStorage.setItem(LS_NO_HELP_KEY, "true");
 		setIsTooltipOpen(false);
+	};
+
+	const handleClick = () => {
+		closeTooltip();
 		help.toggle();
 	};
 
@@ -101,24 +103,27 @@ const HelpButton = ({ help }: { help: Help }) => {
 	}, []);
 
 	return (
-		<Tooltip
-			classNames={{ tooltip: classes.helpTooltip }}
-			opened={isTooltipOpen}
-			arrowSize={8}
-			offset={10}
-			multiline
-			w={210}
-			color="orange"
-			label="First time here? Click below to toggle the help messages!"
-		>
+		<DialogTrigger isOpen={isTooltipOpen}>
 			<Button
 				className={clsx(menuButtonStyles, "px-2 py-1 text-sm")}
 				onPress={handleClick}
 			>
 				{help.isShowing ? "Hide" : "Show"} Help
-				<IconHelp size="1.25rem" style={{ marginLeft: "0.25rem" }} />
+				<IconHelp size="1.25rem" className="ml-1" />
 			</Button>
-		</Tooltip>
+			<Popover offset={8}>
+				<Dialog className="animate-pulse rounded bg-orange-300 px-4 py-2 pr-7 pt-3 dark:bg-orange-500">
+					<Button
+						onPress={closeTooltip}
+						className="absolute right-1 top-1 p-1"
+						aria-label="Close dialog"
+					>
+						<IconX size="1rem" />
+					</Button>
+					First time here? Click below to toggle the help messages!
+				</Dialog>
+			</Popover>
+		</DialogTrigger>
 	);
 };
 

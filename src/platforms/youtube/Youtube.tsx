@@ -1,26 +1,15 @@
 import { type PropsWithChildren, useState } from "react";
-import {
-	Box,
-	Button,
-	Center,
-	Flex,
-	Group,
-	Stack,
-	Text,
-	TextInput,
-	useComputedColorScheme,
-	useMantineTheme,
-} from "@mantine/core";
+import { Button } from "react-aria-components";
+import clsx from "clsx";
+
+import { actionBtnStyles } from "~/styles";
+import CenteredLoading from "~/components/CenteredLoading";
 
 import {
 	extractVideoIdFromUrl,
 	useYouTubePlayer,
 	YouTubePlayerStatus,
 } from "./internals";
-
-import CenteredLoading from "~/components/CenteredLoading";
-
-import classes from "./YouTube.module.css";
 
 export default function YouTubeEditor({ children }: PropsWithChildren) {
 	const { status, setStatus, setVideoId } = useYouTubePlayer();
@@ -35,12 +24,15 @@ export default function YouTubeEditor({ children }: PropsWithChildren) {
 			return <CenteredLoading message="Loading YouTube player" />;
 		case YouTubePlayerStatus.BAD_ID:
 			return (
-				<Box ta="center" mt="2rem">
-					<Text>Cannot use that video ID.</Text>
-					<Text className={classes.different} onClick={handleRetry}>
+				<div className="mt-8 text-center">
+					<p>Cannot use that video ID.</p>
+					<Button
+						className="text-violet-400 underline dark:text-violet-800"
+						onPress={handleRetry}
+					>
 						Try a different one?
-					</Text>
-				</Box>
+					</Button>
+				</div>
 			);
 		case YouTubePlayerStatus.LOADED:
 			return <UrlForm setVideoId={setVideoId} />;
@@ -49,14 +41,12 @@ export default function YouTubeEditor({ children }: PropsWithChildren) {
 		case YouTubePlayerStatus.READY:
 			return children;
 		default:
-			return <Center mt="2rem">Oops! Something went wrong!</Center>;
+			return <p className="mt-8 text-center">Oops! Something went wrong!</p>;
 	}
 }
 
 const UrlForm = ({ setVideoId }: { setVideoId: (id: string) => void }) => {
 	const [input, setInput] = useState("");
-	const scheme = useComputedColorScheme();
-	const theme = useMantineTheme();
 	const [error, setError] = useState(false);
 
 	const handleLoadUrl = () => {
@@ -69,44 +59,50 @@ const UrlForm = ({ setVideoId }: { setVideoId: (id: string) => void }) => {
 		setVideoId(input);
 	};
 
-	const isDark = scheme === "dark";
-	const logoDark = theme.colors.grape[5];
-	const logoLight = theme.colors.violet[9];
-
 	return (
-		<Flex className={classes.flex}>
-			<Stack className={classes.stack}>
-				<Text>Please enter or paste in a YouTube video URL or ID</Text>
-				<TextInput
-					value={input}
-					styles={{ root: { width: "100%" }, input: { textAlign: "center" } }}
-					error={error && "Not a valid YouTube URL"}
-					onChange={(e) => {
-						setError(false);
-						setInput(e.target.value);
-					}}
-				/>
-				<Group>
+		<div className="flex w-full justify-center overflow-hidden">
+			<div className="mx-4 mb-4 mt-8 flex max-w-sm flex-1 flex-col items-center gap-4">
+				<p>Please enter or paste in a YouTube video URL or ID</p>
+				<div className="flex w-full flex-col gap-2">
+					<input
+						value={input}
+						className={clsx(
+							"w-full rounded border px-2 py-0.5 text-center",
+							error ? "border-red-500 text-red-500" : "border-zinc-400",
+						)}
+						onChange={(e) => {
+							setError(false);
+							setInput(e.target.value);
+						}}
+					/>
+					{
+						<p
+							className={clsx(
+								"text-center text-xs text-red-500",
+								!error && "opacity-0",
+							)}
+						>
+							Not a valid YouTube URL or ID
+						</p>
+					}
+				</div>
+				<div className="flex items-center gap-4">
 					<Button
-						disabled={!input.length}
-						variant="filled"
-						size="sm"
-						color={isDark ? logoDark : logoLight}
-						onClick={handleLoadUrl}
+						isDisabled={!input.length}
+						className={actionBtnStyles}
+						onPress={handleLoadUrl}
 					>
 						Load Url
 					</Button>
 					<Button
-						disabled={!input.length}
-						variant="filled"
-						size="sm"
-						color={isDark ? logoDark : logoLight}
-						onClick={handleLoadId}
+						isDisabled={!input.length}
+						className={actionBtnStyles}
+						onPress={handleLoadId}
 					>
 						Load video ID
 					</Button>
-				</Group>
-			</Stack>
-		</Flex>
+				</div>
+			</div>
+		</div>
 	);
 };

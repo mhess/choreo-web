@@ -1,5 +1,3 @@
-import { Center, Stack, Text } from "@mantine/core";
-
 import { SpotifyPlayerStatus, useSpotifyPlayer } from "./internals";
 
 import Loading from "~/components/Loading";
@@ -12,28 +10,26 @@ export default function Spotify({
 
 	if (status === SpotifyPlayerStatus.LOGGED_OUT)
 		return (
-			<Center h="100%">
-				<Text>
+			<div className="flex w-full justify-center">
+				<p>
 					Please <a href="/api/login">log&nbsp;in</a> to your spotify premium
 					account.
-				</Text>
-			</Center>
+				</p>
+			</div>
 		);
 
 	return status === SpotifyPlayerStatus.READY ? (
 		children
 	) : (
-		<Center mx="1rem" h="100%">
-			{messageByStatus[status]}
-		</Center>
+		<div className="mx-4 h-full">{messageByStatus[status]}</div>
 	);
 }
 
 const TryAgain = ({ message }: { message: string }) => (
-	<Text>
+	<p>
 		{message} Would you like to try to <a href="/api/login">log&nbsp;in</a> to
 		Spotify again?
-	</Text>
+	</p>
 );
 
 const messageByStatus: Record<
@@ -42,15 +38,16 @@ const messageByStatus: Record<
 > = {
 	[SpotifyPlayerStatus.LOADING]: <Loading message="Connecting to Spotify" />,
 	[SpotifyPlayerStatus.NOT_CONNECTED]: (
-		<Stack align="center">
-			<Text>
-				Please connect to the "Choreo Player" device in the Spotify player.
-			</Text>
-			<Text>
+		<div className="flex flex-col items-center">
+			<p>
+				Please connect to the &ldquo;Choreo Player&rdquo; device in the Spotify
+				player.
+			</p>
+			<p>
 				Ensure the device with the Spotify player is on the same network as this
 				one.
-			</Text>
-			<Text>
+			</p>
+			<p>
 				See this{" "}
 				<a
 					href="https://support.spotify.com/us/article/spotify-connect/"
@@ -59,9 +56,9 @@ const messageByStatus: Record<
 				>
 					article
 				</a>{" "}
-				if you're having trouble.
-			</Text>
-		</Stack>
+				if you&apos;re having trouble.
+			</p>
+		</div>
 	),
 	[SpotifyPlayerStatus.PLAYBACK_ERROR]: (
 		<TryAgain message="There was an error with playback." />
