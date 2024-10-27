@@ -10,43 +10,13 @@ import {
 } from "vitest";
 import { act, render, screen, within } from "@testing-library/react";
 
-import { withStore } from "~/test/utils";
+import { withStore, expectNoDomChange, expectOnly } from "~/test/utils";
 import { FakeSpotifyPlayer } from "./fakePlayer";
 import { PlatformPlayer } from "~/lib/player";
 import { spotifyTokenAtom } from "./internals";
 import { spotifyTokenParam } from "~/../shared";
 
 import SpotifyComponent from "./Spotify";
-
-const noDomChange = (container: HTMLElement, timeout = 100) =>
-	new Promise<boolean>((resolve) => {
-		const observer = new MutationObserver(() => {
-			resolve(false);
-		});
-		observer.observe(container, { childList: true, subtree: true });
-		setTimeout(() => resolve(true), timeout);
-	});
-
-const expectOnly = (
-	container: HTMLElement,
-	getEl: () => HTMLElement,
-	timeout = 1000,
-): Promise<HTMLElement> =>
-	new Promise((resolve, reject) => {
-		const callback = () => {
-			try {
-				resolve(getEl());
-			} catch (e) {
-				reject(e);
-			}
-		};
-
-		const observer = new MutationObserver(callback);
-
-		setTimeout(callback, timeout);
-
-		observer.observe(container, { childList: true, subtree: true });
-	});
 
 const assertScriptAndInvokeCallback = () => {
 	const scripts = document.body.getElementsByTagName("script");
@@ -73,12 +43,13 @@ describe("Spotify", () => {
 			getOAuthToken: () => {},
 		});
 
-		vi.spyOn(spotifyPlayer, "connect").mockReturnValue(Promise.resolve(true));
-
 		window.Spotify = {
 			Player: vi.fn(() => spotifyPlayer) as unknown as typeof Spotify.Player,
 		};
 
+		vi.spyOn(spotifyPlayer, "connect").mockRejectedValue(
+			"connect should not have been called",
+		);
 		vi.spyOn(console, "error").mockImplementation(() => {});
 	});
 
@@ -91,14 +62,14 @@ describe("Spotify", () => {
 	});
 
 	it("Renders log in screen when not logged in", async () => {
-		const { container } = render(
+		render(
 			<SpotifyComponent token={null}>
 				<div data-testid="entries" />
 			</SpotifyComponent>,
 			{ wrapper },
 		);
 
-		const link = await expectOnly(container, () =>
+		const link = await expectOnly(() =>
 			screen.getByRole("link", { name: /^log\sin$/ }),
 		);
 
@@ -116,8 +87,9 @@ describe("Spotify", () => {
 	};
 
 	it("Renders message on initialization error", async () => {
+		(spotifyPlayer.connect as Mock).mockResolvedValue(false);
 		const msg = "Initialization failed.";
-		const { rerender, container } = render(
+		const { rerender } = render(
 			<SpotifyComponent token="testToken">
 				<div data-testid="entries" />
 			</SpotifyComponent>,
@@ -134,11 +106,9 @@ describe("Spotify", () => {
 
 		screen.getByText("Connecting to Spotify");
 
-		(spotifyPlayer.connect as Mock).mockReturnValue(Promise.resolve(false));
-
 		assertScriptAndInvokeCallback();
 
-		const msgEl = await expectOnly(container, () =>
+		const msgEl = await expectOnly(() =>
 			screen.getByText(new RegExp(`^${msg}`)),
 		);
 
@@ -150,7 +120,8 @@ describe("Spotify", () => {
 		msg: string,
 		afterPlayerCreation: () => void,
 	) => {
-		const { rerender, container } = render(
+		(spotifyPlayer.connect as Mock).mockResolvedValue(true);
+		const { rerender } = render(
 			<SpotifyComponent token="testToken">
 				<div data-testid="entries" />
 			</SpotifyComponent>,
@@ -169,11 +140,11 @@ describe("Spotify", () => {
 
 		assertScriptAndInvokeCallback();
 
-		await expectOnly(container, () => screen.getByText(connectDeviceMsg));
+		await expectOnly(() => screen.getByText(connectDeviceMsg));
 
 		afterPlayerCreation();
 
-		const msgEl = await expectOnly(container, () =>
+		const msgEl = await expectOnly(() =>
 			screen.getByText(new RegExp(`^${msg}`)),
 		);
 
@@ -204,20 +175,24 @@ describe("Spotify", () => {
 		],
 	])("%s", testMessageAfterError);
 
-	const testEntriesRenderedAndPlayer = async (container: HTMLElement) => {
+	const testEntriesRenderedAndPlayer = async (
+		resolveConnect: (res: boolean) => void,
+	) => {
 		expect(screen.getByText("Connecting to Spotify")).toBeInTheDocument();
 
 		expect(screen.queryByTestId("entries")).not.toBeInTheDocument();
 
-		await expect(noDomChange(container)).resolves.toBeTruthy();
+		await expectNoDomChange();
 
 		assertScriptAndInvokeCallback();
 
-		await expectOnly(container, () => screen.getByText(connectDeviceMsg));
+		resolveConnect(true);
+
+		await expectOnly(() => screen.getByText(connectDeviceMsg));
 
 		expect(screen.queryByTestId("entries")).not.toBeInTheDocument();
 
-		await expect(noDomChange(container)).resolves.toBeTruthy();
+		await expectNoDomChange();
 
 		expect(Spotify.Player).toHaveBeenCalledOnce();
 
@@ -233,9 +208,10 @@ describe("Spotify", () => {
 		expect(mock).toHaveBeenCalledOnce();
 		expect(mock).toHaveBeenCalledWith("testToken");
 
+		// Delayed ready status so that
 		spotifyPlayer._setPlayerReady();
 
-		await expectOnly(container, () => screen.getByTestId("entries"));
+		await expectOnly(() => screen.getByTestId("entries"));
 
 		const { playerAtom, pausedAtom, artistAtom, trackNameAtom } =
 			getAtoms("spotify");
@@ -294,7 +270,14 @@ describe("Spotify", () => {
 
 	it("Renders loading screens, entries, and creates player with token from params", async () => {
 		localStorage.clear();
-		const { rerender, container } = render(
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		let resolve = (v: unknown) => {};
+		(spotifyPlayer.connect as Mock).mockReturnValue(
+			new Promise((res) => {
+				resolve = res;
+			}),
+		);
+		const { rerender } = render(
 			<SpotifyComponent token="testToken">
 				<div data-testid="entries" />
 			</SpotifyComponent>,
@@ -313,23 +296,30 @@ describe("Spotify", () => {
 			JSON.stringify("testToken"),
 		);
 
-		await testEntriesRenderedAndPlayer(container);
+		await testEntriesRenderedAndPlayer(resolve);
 	});
 
 	it("Renders loading screens, entries, and creates player with token from localStorage", async () => {
 		setAtoms([[spotifyTokenAtom, "testToken"]]);
-
-		const { container } = render(
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		let resolve = (v: unknown) => {};
+		(spotifyPlayer.connect as Mock).mockReturnValue(
+			new Promise((res) => {
+				resolve = res;
+			}),
+		);
+		render(
 			<SpotifyComponent token={null}>
 				<div data-testid="entries" />
 			</SpotifyComponent>,
 			{ wrapper },
 		);
 
-		await testEntriesRenderedAndPlayer(container);
+		await testEntriesRenderedAndPlayer(resolve);
 	});
 
 	it("Only creates a single player after remounting", async () => {
+		(spotifyPlayer.connect as Mock).mockResolvedValue(true);
 		setAtoms([[spotifyTokenAtom, "testToken"]]);
 
 		const { unmount } = render(
@@ -341,7 +331,7 @@ describe("Spotify", () => {
 
 		unmount();
 
-		const { container } = render(
+		render(
 			<SpotifyComponent token={null}>
 				<div data-testid="entries" />
 			</SpotifyComponent>,
@@ -350,7 +340,7 @@ describe("Spotify", () => {
 
 		assertScriptAndInvokeCallback();
 
-		await expectOnly(container, () => screen.getByText(connectDeviceMsg));
+		await expectOnly(() => screen.getByText(connectDeviceMsg));
 
 		expect(Spotify.Player).toHaveBeenCalledOnce();
 	});

@@ -3,7 +3,7 @@ import { Button } from "react-aria-components";
 import clsx from "clsx";
 
 import { actionBtnStyles } from "~/styles";
-import CenteredLoading from "~/components/CenteredLoading";
+import Loading from "~/components/Loading";
 
 import {
 	extractVideoIdFromUrl,
@@ -21,7 +21,7 @@ export default function YouTubeEditor({ children }: PropsWithChildren) {
 
 	switch (status) {
 		case YouTubePlayerStatus.LOADING:
-			return <CenteredLoading message="Loading YouTube player" />;
+			return <Loading message="Loading YouTube player" />;
 		case YouTubePlayerStatus.BAD_ID:
 			return (
 				<div className="mt-8 text-center">
@@ -37,7 +37,7 @@ export default function YouTubeEditor({ children }: PropsWithChildren) {
 		case YouTubePlayerStatus.LOADED:
 			return <UrlForm setVideoId={setVideoId} />;
 		case YouTubePlayerStatus.BUFFERING:
-			return <CenteredLoading message="Waiting for video to load" />;
+			return <Loading message="Waiting for video to load" />;
 		case YouTubePlayerStatus.READY:
 			return children;
 		default:

@@ -1,6 +1,7 @@
 import { type WritableAtom, createStore, Provider } from "jotai";
 import type { PropsWithChildren } from "react";
-import { beforeEach } from "vitest";
+import { beforeEach, expect } from "vitest";
+
 import {
 	type Platform,
 	atomsForPlatformAtom,
@@ -50,3 +51,29 @@ export const withStore = () => {
 
 	return { setPlatform, getAtoms, setAtoms, getStore, wrapper };
 };
+
+export const expectNoDomChange = (timeout = 200) =>
+	expect(
+		new Promise<boolean>((resolve) => {
+			const observer = new MutationObserver(() => resolve(false));
+			observer.observe(document.body, { childList: true, subtree: true });
+			setTimeout(() => resolve(true), timeout);
+		}),
+	).resolves.toBe(true);
+
+export const expectOnly = (getEl: () => HTMLElement): Promise<HTMLElement> =>
+	new Promise((resolve, reject) => {
+		const callback = () => {
+			try {
+				resolve(getEl());
+			} catch (e) {
+				reject(e);
+			}
+		};
+
+		const observer = new MutationObserver(callback);
+
+		setTimeout(callback, 200);
+
+		observer.observe(document.body, { childList: true, subtree: true });
+	});
