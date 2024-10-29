@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 export const displayMs = (totalMs: number) => {
-	const ms = (totalMs % 1000).toString().slice(0, 2).padStart(2, "0");
-	const totalSeconds = Math.floor(totalMs / 1000);
-	const minutes = Math.floor(totalSeconds / 60);
-	const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+	const hundredths = Math.round(totalMs / 10);
+	const hundredthsStr = hundredths.toString().slice(-2).padStart(2, "0");
+	const seconds = Math.floor(hundredths / 100);
+	const minutes = Math.floor(seconds / 60);
+	const secondsStr = (seconds % 60).toString().padStart(2, "0");
 
-	return `${minutes}:${seconds}.${ms}`;
+	return `${minutes}:${secondsStr}.${hundredthsStr}`;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

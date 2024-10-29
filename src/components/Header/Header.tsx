@@ -7,6 +7,7 @@ import {
 	Button,
 } from "react-aria-components";
 import { IconChevronDown, IconMoon, IconSun } from "@tabler/icons-react";
+import clsx from "clsx";
 
 import {
 	artistAtom,
@@ -23,8 +24,7 @@ import SelectPlatformButton from "./SelectPlatformButton";
 import MenuDropdown from "./MenuDropdown";
 import Hamburger from "./Hamburger";
 
-import { ctlBarStyles, menuButtonStyles, menuStyles } from "~/styles";
-import clsx from "clsx";
+import { ctlBarStyles, menuButtonStyles, tooltipStyles } from "~/styles";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -138,7 +138,7 @@ const ToggleColorScheme = () => {
 			>
 				{React.createElement(isDark ? IconMoon : IconSun, { size: "1.25rem" })}
 			</Button>
-			<Tooltip className={`${menuStyles} text-sm`} offset={8}>
+			<Tooltip className={tooltipStyles} offset={8}>
 				Toggle light/dark mode
 			</Tooltip>
 		</TooltipTrigger>
