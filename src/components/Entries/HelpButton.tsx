@@ -1,18 +1,11 @@
 import { IconHelp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { forwardRef, useEffect, useRef, useState } from "react";
-import {
-	Button,
-	Dialog,
-	DialogTrigger,
-	Heading,
-	Modal,
-	ModalOverlay,
-} from "react-aria-components";
+import { Button, Heading, Dialog } from "react-aria-components";
+import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 
+import { useIsMobile } from "~/lib/utils";
 import { actionBtnStyles, menuButtonStyles } from "~/styles";
-
-const LS_NO_HELP_KEY = "helpDismissed";
 
 interface Props {
 	help: { isShowing: boolean; toggle: () => void };
@@ -20,98 +13,112 @@ interface Props {
 
 export default function HelpButton(props: Props) {
 	const { help } = props;
-	const [isTooltipOpen, setIsTooltipOpen] = useState(false);
-	const triggerRef = useRef(null);
+	const isMobile = useIsMobile();
 
-	const closeTooltip = () => {
-		if (isTooltipOpen) localStorage.setItem(LS_NO_HELP_KEY, "true");
-		setIsTooltipOpen(false);
-	};
+	const highlightRef = useRef(null);
+	const modalRef = useRef(null);
 
-	const handlePress = () => {
-		closeTooltip();
-		help.toggle();
-	};
+	const state = useModalState();
 
-	useEffect(() => {
-		const noHelp = !!localStorage.getItem(LS_NO_HELP_KEY);
-		if (!noHelp) setIsTooltipOpen(true);
-	}, []);
+	const { underlayProps, modalProps } = useModalOverlay({}, state, modalRef);
+	const { overlayProps } = useOverlayTrigger({ type: "dialog" }, state);
 
 	return (
-		<DialogTrigger isOpen={isTooltipOpen}>
-			<TriggerButton
-				ref={triggerRef}
-				onPress={handlePress}
+		<>
+			<HighlightButton
+				ref={highlightRef}
+				onPress={help.toggle}
 				isHelpShowing={help.isShowing}
 			/>
-			<ModalOverlay className="fixed inset-0 overflow-hidden bg-black/75">
-				<Modal className="flex h-full flex-col items-center justify-center p-4">
-					<Dialog className="max-h-full max-w-lg rounded-md bg-zinc-100 p-6 dark:bg-zinc-700">
+			{state.isOpen && (
+				<Overlay>
+					<div {...underlayProps} className="react-aria-ModalOverlay">
 						<div
-							className="overflow-auto"
-							style={{ maxHeight: "calc(100vh - 5rem)" }}
+							ref={modalRef}
+							{...modalProps}
+							className="flex h-full flex-col items-center justify-center p-4"
 						>
-							<Heading slot="title" className="mb-4 text-xl">
-								First time here?
-							</Heading>
-							<div className="flex flex-col gap-4">
-								<p>
-									Click the &ldquo;Show Help&rdquo; button in the bottom right
-									corner of the screen to toggle the help messages!
-								</p>
-								<div className="flex justify-end">
-									<Button onPress={closeTooltip} className={actionBtnStyles}>
-										Dismiss
-									</Button>
-								</div>
-							</div>
-							<TriggerButton
-								originalRef={triggerRef}
-								onPress={handlePress}
-								isHelpShowing={help.isShowing}
-							/>
+							<Dialog
+								{...overlayProps}
+								className="max-h-full max-w-lg rounded-md bg-zinc-100 p-6 dark:bg-zinc-700"
+							>
+								<>
+									<Heading slot="title" className="mb-4 text-xl">
+										First time here?
+									</Heading>
+									<div className="flex flex-col gap-4">
+										<p>
+											Click the &ldquo;Show Help&rdquo; button{" "}
+											{isMobile
+												? "at the bottom"
+												: "in the bottom right corner"}{" "}
+											of the screen to toggle the help messages!
+										</p>
+										<Button
+											onPress={state.close}
+											className={clsx(actionBtnStyles, "self-end")}
+										>
+											Dismiss
+										</Button>
+									</div>
+									<HighlightButton
+										originalRef={highlightRef}
+										onPress={() => {
+											state.close();
+											help.toggle();
+										}}
+									/>
+								</>
+							</Dialog>
 						</div>
-					</Dialog>
-				</Modal>
-			</ModalOverlay>
-		</DialogTrigger>
+					</div>
+				</Overlay>
+			)}
+		</>
 	);
 }
 
 interface TriggerButtonProps {
-	isHelpShowing: boolean;
+	isHelpShowing?: boolean;
 	onPress: () => void;
 	originalRef?: React.MutableRefObject<HTMLButtonElement | null>;
 }
 
-const TriggerButton = forwardRef<HTMLButtonElement, TriggerButtonProps>(
-	function TriggerButton(props, ref) {
+interface ModalHelpStyles {
+	bottom: number;
+	right: number | string;
+	transform?: string;
+}
+
+const HighlightButton = forwardRef<HTMLButtonElement, TriggerButtonProps>(
+	function HighlightButton(props, ref) {
+		const isMobile = useIsMobile();
 		const { isHelpShowing, onPress, originalRef } = props;
-		const [coords, setCoordinates] = useState<DOMRect>();
+		const [btnStyles, setBtnStyles] = useState<ModalHelpStyles>();
 		const innerRef = useRef(null);
 
 		useEffect(() => {
 			if (!originalRef) return;
-			setCoordinates(originalRef.current!.getBoundingClientRect());
-		}, []);
+			const { right: fromLeft, bottom: fromTop } =
+				originalRef.current!.getBoundingClientRect();
+			const right = isMobile ? "50%" : window.innerWidth - fromLeft;
+			const bottom = window.innerHeight - fromTop;
+			const transform = isMobile ? "translateX(50%)" : undefined;
+
+			setBtnStyles({ right, bottom, transform });
+		}, [isMobile]);
 
 		return (
-			(coords || !originalRef) && (
+			(btnStyles || !originalRef) && (
 				<Button
 					ref={originalRef ? innerRef : ref}
 					className={clsx(
 						menuButtonStyles,
 						"px-2 py-1 text-sm",
-						coords &&
+						btnStyles &&
 							"fixed shadow-[0_0_10px_1px] shadow-white data-[focus-visible]:outline-orange-500",
 					)}
-					style={
-						coords && {
-							right: `calc(100vw - ${coords.right}px)`,
-							bottom: `calc(100vh - ${coords.bottom}px)`,
-						}
-					}
+					style={btnStyles}
 					onPress={onPress}
 				>
 					{isHelpShowing ? "Hide" : "Show"} Help
@@ -121,3 +128,18 @@ const TriggerButton = forwardRef<HTMLButtonElement, TriggerButtonProps>(
 		);
 	},
 );
+
+const useModalState = () => {
+	const [isOpen, setOpen] = useState(!localStorage.helpDismissed);
+
+	return {
+		open: () => setOpen(true),
+		close: () => {
+			setOpen(false);
+			localStorage.helpDismissed = true;
+		},
+		isOpen,
+		setOpen,
+		toggle: () => setOpen((prev) => !prev),
+	};
+};

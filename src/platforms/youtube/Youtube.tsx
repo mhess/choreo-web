@@ -27,7 +27,7 @@ export default function YouTubeEditor({ children }: PropsWithChildren) {
 				<div className="mt-8 text-center">
 					<p>Cannot use that video ID.</p>
 					<Button
-						className="text-violet-400 underline dark:text-violet-800"
+						className="text-violet-700 underline dark:text-violet-500"
 						onPress={handleRetry}
 					>
 						Try a different one?
@@ -68,7 +68,9 @@ const UrlForm = ({ setVideoId }: { setVideoId: (id: string) => void }) => {
 						value={input}
 						className={clsx(
 							"w-full rounded border px-2 py-0.5 text-center",
-							error ? "border-red-500 text-red-500" : "border-zinc-400",
+							error
+								? "border-red-500 text-red-500 dark:text-red-300"
+								: "border-zinc-400",
 						)}
 						onChange={(e) => {
 							setError(false);
@@ -92,7 +94,7 @@ const UrlForm = ({ setVideoId }: { setVideoId: (id: string) => void }) => {
 						className={actionBtnStyles}
 						onPress={handleLoadUrl}
 					>
-						Load Url
+						Load URL
 					</Button>
 					<Button
 						isDisabled={!input.length}

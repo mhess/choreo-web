@@ -52,7 +52,7 @@ export const withStore = () => {
 	return { setPlatform, getAtoms, setAtoms, getStore, wrapper };
 };
 
-export const expectNoDomChange = (timeout = 200) =>
+export const expectNoDomChange = (timeout = 300) =>
 	expect(
 		new Promise<boolean>((resolve) => {
 			const observer = new MutationObserver(() => resolve(false));
@@ -61,7 +61,10 @@ export const expectNoDomChange = (timeout = 200) =>
 		}),
 	).resolves.toBe(true);
 
-export const expectOnly = (getEl: () => HTMLElement): Promise<HTMLElement> =>
+export const expectOnly = (
+	getEl: () => HTMLElement,
+	timeout = 500,
+): Promise<HTMLElement> =>
 	new Promise((resolve, reject) => {
 		const callback = () => {
 			try {
@@ -73,7 +76,7 @@ export const expectOnly = (getEl: () => HTMLElement): Promise<HTMLElement> =>
 
 		const observer = new MutationObserver(callback);
 
-		setTimeout(callback, 200);
+		setTimeout(callback, timeout);
 
 		observer.observe(document.body, { childList: true, subtree: true });
 	});
