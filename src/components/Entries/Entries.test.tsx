@@ -7,14 +7,7 @@ import {
 	type Mock,
 	afterEach,
 } from "vitest";
-import {
-	act,
-	render,
-	screen,
-	waitFor,
-	waitForElementToBeRemoved,
-	within,
-} from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
 import { useAtom } from "jotai";
@@ -62,7 +55,7 @@ describe("Entries", () => {
 
 		const { playerAtom } = getAtoms(platform);
 		setAtoms([[playerAtom, player]]);
-		localStorage.autoHelp = true;
+		localStorage.helpDismissed = true;
 	});
 
 	afterEach(() => {
@@ -435,22 +428,18 @@ describe("Entries", () => {
 		// Using this less efficient query bc it's the same used to assert element
 		// not rendered.
 		const findTooltip = () =>
-			waitFor(
-				() =>
-					expect(screen.getByRole("dialog")).toHaveTextContent(/^First time/),
-				{
-					interval: 10,
-					timeout: 30,
-				},
-			);
+			waitFor(() => screen.getByRole("dialog", { name: "First time here?" }), {
+				interval: 10,
+				timeout: 30,
+			});
 
 		await findTooltip();
 
 		await user.click(screen.getByRole("button", { name: "Show Help" }));
 
-		await waitForElementToBeRemoved(() =>
-			screen.queryByRole("tooltip", { name: /^First time/ }),
-		);
+		expect(
+			screen.queryByRole("dialog", { name: "First time here?" }),
+		).not.toBeInTheDocument();
 
 		expect(screen.getByTestId("help")).toBeInTheDocument();
 
@@ -463,7 +452,7 @@ describe("Entries", () => {
 		render(<Entries />, { wrapper });
 
 		await expect(findTooltip).rejects.toThrow(
-			'Unable to find role="tooltip" and name `/^First time/`',
+			'Unable to find role="dialog" and name "First time here?"',
 		);
 	});
 

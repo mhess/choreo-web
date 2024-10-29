@@ -40,7 +40,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 	return (
 		<div
 			role="row"
-			className={`flex items-center pl-4 pr-2 ${isCurrent ? "bg-orange-300 dark:bg-amber-600" : "bg-zinc-200 odd:bg-zinc-400 dark:bg-zinc-800 dark:odd:bg-zinc-900"}`}
+			className={`flex items-center pl-4 pr-2 ${isCurrent ? "bg-orange-300 dark:bg-yellow-700" : "bg-zinc-300 odd:bg-zinc-400 dark:bg-zinc-800 dark:odd:bg-zinc-900"}`}
 		>
 			<div>
 				{canFill ? (
