@@ -5,32 +5,37 @@ import {
 	Tooltip,
 	TooltipTrigger,
 } from "react-aria-components";
+import { tw } from "~/lib/utils";
 
-import { tooltipStyles } from "~/styles";
+import { tooltipStyles, withArrow } from "~/styles";
 
 interface Props extends React.PropsWithChildren {
 	tooltip: React.ReactNode;
+	className?: string;
 }
 
 const isTouchDevice = window.ontouchstart || navigator.maxTouchPoints > 0;
 
 export default function TooltipWithClick(props: Props) {
-	const { tooltip, children } = props;
+	const { tooltip, children, className } = props;
+	const styles = className ? className : tw`${tooltipStyles} max-w-xs`;
 
 	return isTouchDevice ? (
 		<DialogTrigger>
 			{children}
-			<Popover offset={8}>
-				<Dialog className={`${tooltipStyles} max-w-xs`}>
-					<p>{tooltip}</p>
-				</Dialog>
+			<Popover offset={10}>
+				{withArrow(
+					<Dialog className={styles}>
+						<p>{children}</p>
+					</Dialog>,
+				)}
 			</Popover>
 		</DialogTrigger>
 	) : (
 		<TooltipTrigger delay={0}>
 			{children}
-			<Tooltip className={`${tooltipStyles} max-w-xs`} offset={8}>
-				{tooltip}
+			<Tooltip className={styles} offset={10}>
+				{withArrow(tooltip)}
 			</Tooltip>
 		</TooltipTrigger>
 	);
