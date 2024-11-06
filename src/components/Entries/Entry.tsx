@@ -4,8 +4,6 @@ import {
 	DialogTrigger,
 	Heading,
 	Modal,
-	Tooltip,
-	TooltipTrigger,
 	Button,
 } from "react-aria-components";
 import { IconArrowMoveDown, IconX } from "@tabler/icons-react";
@@ -14,7 +12,8 @@ import { displayMs } from "~/lib/utils";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { entryAtomsForPlatformAtom, type AtomicEntry } from "~/lib/entries";
 import InputWithAtom from "~/components/TextInputWithAtom";
-import { actionBtnStyles, menuStyles } from "~/styles";
+import Tooltip, { tooltipStyles } from "~/components/Tooltip";
+import { actionBtnStyles } from "~/styles";
 
 import { COUNT_LABEL, NOTE_LABEL } from "./shared";
 
@@ -45,10 +44,15 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 			<div>
 				{canFill ? (
 					<DialogTrigger>
-						<TooltipTrigger delay={500}>
+						<Tooltip
+							tooltip="Use the timing of this and the previous entry to fill in counts
+								for the remaining entries."
+							offset={12}
+							className={`${tooltipStyles} max-w-[19.25rem]`}
+						>
 							<div className="relative">
 								<Button
-									className="absolute top-0.5 cursor-pointer text-blue-600 hover:text-blue-300 dark:text-blue-400"
+									className="absolute top-0.5 cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
 									aria-label="Fill in the rest of entry counts"
 								>
 									<IconArrowMoveDown
@@ -57,11 +61,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 									/>
 								</Button>
 							</div>
-							<Tooltip className={`${menuStyles} w-64 text-sm`} offset={8}>
-								Use the timing of this and the previous entry to fill in counts
-								for the remaining entries.
-							</Tooltip>
-						</TooltipTrigger>
+						</Tooltip>
 						<Modal>
 							<Dialog className="max-w-lg overflow-auto rounded-md bg-zinc-100 p-8 outline-none dark:bg-zinc-700">
 								{({ close }) => (
