@@ -10,30 +10,24 @@ export const displayMs = (totalMs: number) => {
 	return `${minutes}:${secondsStr}.${hundredthsStr}`;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const debounced = (fn: (...rest: any[]) => void, timeMs: number) => {
-	let timeoutId: number | undefined = undefined;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return (...args: any[]) => {
-		if (timeoutId !== undefined) window.clearTimeout(timeoutId);
-		timeoutId = window.setTimeout(() => fn(...args), timeMs);
-	};
-};
-
-const darkClassName = "dark";
+declare global {
+	interface Window {
+		darkClassName: "dark";
+	}
+}
 
 const getIsDark = () =>
-	document.documentElement.classList.contains(darkClassName);
-
-const toggleColorScheme = () => {
-	const isDark = getIsDark();
-	document.documentElement.classList.toggle(darkClassName);
-	localStorage.theme = isDark ? "light" : darkClassName;
-};
+	document.documentElement.classList.contains(window.darkClassName);
 
 export const useColorScheme = () => {
-	const isDark = getIsDark();
-	return { isDark, toggle: toggleColorScheme };
+	const [isDark, setIsDark] = useState(getIsDark);
+	const toggle = () => {
+		document.documentElement.classList.toggle(window.darkClassName);
+		localStorage.theme = isDark ? "light" : window.darkClassName;
+		setIsDark((p) => !p);
+	};
+
+	return { isDark, toggle };
 };
 
 export const IsMobileContext = createContext(false);

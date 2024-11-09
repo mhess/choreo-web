@@ -103,7 +103,7 @@ const SpotifyChangeButton = () => {
 			<Button
 				className={clsx(
 					menuButtonStyles,
-					"relative -top-1 mx-2 h-4 px-1 text-[0.5rem] font-bold",
+					"relative -top-1 mx-2 h-4 cursor-default px-1 text-[0.5rem] font-bold",
 				)}
 			>
 				Change?
@@ -127,10 +127,10 @@ const ToggleColorScheme = () => {
 	const { isDark, toggle } = useColorScheme();
 
 	return (
-		<Tooltip tooltip="Toggle light/dark mode">
+		<Tooltip tooltip="Toggle light/dark mode" delay={1000}>
 			<Button
 				className={`${menuButtonStyles} px-2 py-1`}
-				aria-label="Toggle light/dark mode"
+				aria-label={`Set ${isDark ? "light" : "dark"} color scheme`}
 				onPress={toggle}
 			>
 				{React.createElement(isDark ? IconMoon : IconSun, { size: "1.25rem" })}
