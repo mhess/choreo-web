@@ -1,21 +1,27 @@
 import { IconHelp } from "@tabler/icons-react";
 import clsx from "clsx";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button, Heading, Dialog } from "react-aria-components";
 import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 
 import { useIsMobile } from "~/lib/utils";
 import { actionBtnStyles, menuButtonStyles } from "~/styles";
 
+interface HelpState {
+	isShowing: boolean;
+	toggle: () => void;
+}
+
 interface Props {
-	help: { isShowing: boolean; toggle: () => void };
+	help: HelpState;
 }
 
 export default function HelpButton(props: Props) {
 	const { help } = props;
 	const isMobile = useIsMobile();
 
-	const highlightRef = useRef(null);
+	const dialogRef = useRef(null);
 	const modalRef = useRef(null);
 
 	const state = useModalState();
@@ -25,11 +31,7 @@ export default function HelpButton(props: Props) {
 
 	return (
 		<>
-			<HighlightButton
-				ref={highlightRef}
-				onPress={help.toggle}
-				isHelpShowing={help.isShowing}
-			/>
+			<TriggerButton dialogRef={dialogRef} dialogState={state} help={help} />
 			{state.isOpen && (
 				<Overlay>
 					<div {...underlayProps} className="react-aria-ModalOverlay">
@@ -40,6 +42,7 @@ export default function HelpButton(props: Props) {
 						>
 							<Dialog
 								{...overlayProps}
+								ref={dialogRef}
 								className="max-h-full max-w-lg rounded-md bg-zinc-100 p-6 dark:bg-zinc-700"
 							>
 								<>
@@ -61,13 +64,6 @@ export default function HelpButton(props: Props) {
 											Dismiss
 										</Button>
 									</div>
-									<HighlightButton
-										originalRef={highlightRef}
-										onPress={() => {
-											state.close();
-											help.toggle();
-										}}
-									/>
 								</>
 							</Dialog>
 						</div>
@@ -79,9 +75,9 @@ export default function HelpButton(props: Props) {
 }
 
 interface TriggerButtonProps {
-	isHelpShowing?: boolean;
-	onPress: () => void;
-	originalRef?: React.MutableRefObject<HTMLButtonElement | null>;
+	help: HelpState;
+	dialogRef: React.MutableRefObject<HTMLDivElement | null>;
+	dialogState: ReturnType<typeof useModalState>;
 }
 
 interface ModalHelpStyles {
@@ -90,44 +86,50 @@ interface ModalHelpStyles {
 	transform?: string;
 }
 
-const HighlightButton = forwardRef<HTMLButtonElement, TriggerButtonProps>(
-	function HighlightButton(props, ref) {
-		const isMobile = useIsMobile();
-		const { isHelpShowing, onPress, originalRef } = props;
-		const [btnStyles, setBtnStyles] = useState<ModalHelpStyles>();
-		const innerRef = useRef(null);
+function TriggerButton(props: TriggerButtonProps) {
+	const isMobile = useIsMobile();
+	const btnRef = useRef<HTMLButtonElement>(null);
+	const { help, dialogRef, dialogState } = props;
+	const [dialogBtnStyles, setDialogBtnStyles] = useState<ModalHelpStyles>();
 
-		useEffect(() => {
-			if (!originalRef) return;
-			const { right: fromLeft, bottom: fromTop } =
-				originalRef.current!.getBoundingClientRect();
-			const right = isMobile ? "50%" : window.innerWidth - fromLeft;
-			const bottom = window.innerHeight - fromTop;
-			const transform = isMobile ? "translateX(50%)" : undefined;
+	useEffect(() => {
+		if (!dialogState.isOpen || dialogBtnStyles) return;
+		const { right: fromLeft, bottom: fromTop } =
+			btnRef.current!.getBoundingClientRect();
+		const right = isMobile ? "50%" : window.innerWidth - fromLeft;
+		const bottom = window.innerHeight - fromTop;
+		const transform = isMobile ? "translateX(50%)" : undefined;
 
-			setBtnStyles({ right, bottom, transform });
-		}, [isMobile]);
+		setDialogBtnStyles({ right, bottom, transform });
+	}, [isMobile, dialogState.isOpen]);
 
-		return (
-			(btnStyles || !originalRef) && (
-				<Button
-					ref={originalRef ? innerRef : ref}
-					className={clsx(
-						menuButtonStyles,
-						"px-2 py-1 text-sm",
-						btnStyles &&
-							"fixed shadow-[0_0_10px_1px] shadow-white data-[focus-visible]:outline-orange-500",
-					)}
-					style={btnStyles}
-					onPress={onPress}
-				>
-					{isHelpShowing ? "Hide" : "Show"} Help
-					<IconHelp size="1.25rem" className="ml-1" />
-				</Button>
-			)
-		);
-	},
-);
+	const handlePress = () => {
+		if (dialogState.isOpen) {
+			dialogState.close();
+			setDialogBtnStyles(undefined);
+		}
+		help.toggle();
+	};
+
+	const btnEl = (
+		<Button
+			ref={btnRef}
+			className={clsx(
+				menuButtonStyles,
+				"px-2 py-1 text-sm",
+				dialogBtnStyles &&
+					"fixed shadow-[0_0_10px_1px] shadow-white data-[focus-visible]:outline-orange-500",
+			)}
+			style={dialogBtnStyles}
+			onPress={handlePress}
+		>
+			{help.isShowing ? "Hide" : "Show"} Help
+			<IconHelp size="1.25rem" className="ml-1" />
+		</Button>
+	);
+
+	return dialogBtnStyles ? createPortal(btnEl, dialogRef.current!) : btnEl;
+}
 
 const useModalState = () => {
 	const [isOpen, setOpen] = useState(!localStorage.helpDismissed);

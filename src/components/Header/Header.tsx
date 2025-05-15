@@ -24,7 +24,12 @@ import SelectPlatformButton from "./SelectPlatformButton";
 import MenuDropdown from "./MenuDropdown";
 import Hamburger from "./Hamburger";
 
-import { ctlBarStyles, menuButtonStyles, tooltipStyles } from "~/styles";
+import {
+	ctlBarStyles,
+	menuButtonStyles,
+	tooltipStyles,
+	withArrow,
+} from "~/styles";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -61,9 +66,7 @@ export default function Header() {
 						{isSpotify && <SpotifyChangeButton />}
 						{!isMobile && (
 							<MenuTrigger>
-								<Button
-									className={`${menuButtonStyles} px-2 py-1 text-sm font-bold`}
-								>
+								<Button className={`${menuButtonStyles} px-2 py-1 text-sm`}>
 									Actions
 									<IconChevronDown size="1.25rem" className="translate-y-0.5" />
 								</Button>
@@ -102,7 +105,10 @@ const SpotifyChangeButton = () => {
 	const [player] = useAtom(playerAtom);
 
 	return !player ? null : (
-		<TooltipWithClick tooltip="Use the Spotify desktop or mobile app to change the track.">
+		<TooltipWithClick
+			tooltip={"Use the Spotify desktop or mobile app to change the track."}
+			className={clsx(tooltipStyles, "max-w-72")}
+		>
 			<Button
 				className={clsx(
 					menuButtonStyles,
@@ -138,8 +144,8 @@ const ToggleColorScheme = () => {
 			>
 				{React.createElement(isDark ? IconMoon : IconSun, { size: "1.25rem" })}
 			</Button>
-			<Tooltip className={tooltipStyles} offset={8}>
-				Toggle light/dark mode
+			<Tooltip className={tooltipStyles} offset={10}>
+				{withArrow("Toggle light/dark mode")}
 			</Tooltip>
 		</TooltipTrigger>
 	);
