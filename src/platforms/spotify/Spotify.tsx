@@ -8,20 +8,10 @@ export default function Spotify({
 }: React.PropsWithChildren<{ token: string | null }>) {
 	const status = useSpotifyPlayer(token);
 
-	if (status === SpotifyPlayerStatus.LOGGED_OUT)
-		return (
-			<div className="flex h-full flex-col items-center justify-center">
-				<p>
-					Please <a href="/api/login">log&nbsp;in</a> to your Spotify premium
-					account.
-				</p>
-			</div>
-		);
+	if (status === SpotifyPlayerStatus.READY) return children;
 
-	return status === SpotifyPlayerStatus.READY ? (
-		children
-	) : (
-		<div className="mx-4 flex h-full flex-col justify-center">
+	return (
+		<div className="mx-4 flex h-full flex-col items-center justify-center">
 			{messageByStatus[status]}
 		</div>
 	);
@@ -35,10 +25,16 @@ const TryAgain = ({ message }: { message: string }) => (
 );
 
 const messageByStatus: Record<
-	Exclude<SpotifyPlayerStatus, "loggedOut" | "ready">,
+	Exclude<SpotifyPlayerStatus, "ready">,
 	React.ReactNode
 > = {
 	[SpotifyPlayerStatus.LOADING]: <Loading message="Connecting to Spotify" />,
+	[SpotifyPlayerStatus.LOGGED_OUT]: (
+		<p>
+			Please <a href="/api/login">log&nbsp;in</a> to your Spotify premium
+			account.
+		</p>
+	),
 	[SpotifyPlayerStatus.NOT_CONNECTED]: (
 		<div className="flex flex-col gap-4 text-center">
 			<p>
