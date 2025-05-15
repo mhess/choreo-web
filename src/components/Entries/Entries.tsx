@@ -71,10 +71,10 @@ const borderStyles =
 	"border-r border-solid border-gray-800 dark:border-gray-500";
 
 const EntryHeader = () => (
-	<div role="row" className="flex lowercase pl-4 py-2">
+	<div role="row" className="flex py-2 pl-4 lowercase">
 		<span
 			role="columnheader"
-			className={`${headerStyles} ${borderStyles} w-16 text-right pr-2`}
+			className={`${headerStyles} ${borderStyles} w-16 pr-2 text-right`}
 		>
 			{COUNT_LABEL}
 		</span>

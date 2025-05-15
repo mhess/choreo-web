@@ -33,9 +33,9 @@ export default function Landing() {
 						local file
 					</Text>{" "}
 					to set up a web player that allows you to annotate time points in a
-					track while it's playing. You can use these annotations to navigate
-					around the song easily. The app allows you to save these annotations
-					to CSV files for later.
+					track while it&apos;s playing. You can use these annotations to
+					navigate around the song easily. The app allows you to save these
+					annotations to CSV files for later.
 				</Text>
 				<Group justify="center" mt="1rem">
 					<Button

@@ -11,10 +11,10 @@ export const displayMs = (totalMs: number) => {
 	return `${minutes}:${seconds}.${ms}`;
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: need to be able to use any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const debounced = (fn: (...rest: any[]) => void, timeMs: number) => {
 	let timeoutId: number | undefined = undefined;
-	// biome-ignore lint/suspicious/noExplicitAny: need to be able to use any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	return (...args: any[]) => {
 		if (timeoutId !== undefined) window.clearTimeout(timeoutId);
 		timeoutId = window.setTimeout(() => fn(...args), timeMs);

@@ -23,7 +23,10 @@ import classes from "./Entry.module.css";
 export default function Entry({
 	entry,
 	index,
-}: { entry: AtomicEntry; index: number }) {
+}: {
+	entry: AtomicEntry;
+	index: number;
+}) {
 	const player = useEstablishedPlayer();
 	const [opened, { open: openFillModal, close: closeFillModal }] =
 		useDisclosure();
@@ -92,7 +95,7 @@ export default function Entry({
 					</Tooltip>
 				) : undefined}
 				<InputWithAtom
-					className="w-16 rounded text-right px-2 py-0.5"
+					className="w-16 rounded px-2 py-0.5 text-right"
 					aria-label={COUNT_LABEL}
 					// leftSectionWidth="22"
 					// classNames={{ input: classes.countInput }}
@@ -111,7 +114,7 @@ export default function Entry({
 				{displayTime}
 			</Text>
 			<InputWithAtom
-				className="rounded px-2 py-0.5 flex-1 mr-2"
+				className="mr-2 flex-1 rounded px-2 py-0.5"
 				aria-label={NOTE_LABEL}
 				atom={noteAtom}
 			/>

@@ -43,7 +43,7 @@ export const useAudioFilePlayer = () => {
 	useEffect(() => {
 		audioElRef.current = document.createElement("audio");
 		document.body.appendChild(audioElRef.current);
-		() => audioElRef.current?.remove();
+		return () => audioElRef.current?.remove();
 	}, []);
 
 	useEffect(() => {
@@ -51,7 +51,7 @@ export const useAudioFilePlayer = () => {
 		if (!file || !$audioEl) return;
 
 		setPlayer(new AudioFilePlayer($audioEl, file, setStatus, setPaused));
-		() => file && setStatus(FilePlayerStatus.LOADING);
+		return () => file && setStatus(FilePlayerStatus.LOADING);
 	}, [file, setPaused, setPlayer, setStatus]);
 
 	return { status, setFile };

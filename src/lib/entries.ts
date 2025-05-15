@@ -104,7 +104,7 @@ const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
 	);
 
 	const initEntriesAtom = atom(null, (get, set) => {
-		!get(entriesAtom).length && set(entriesAtom);
+		if (!get(entriesAtom).length) set(entriesAtom);
 	});
 
 	const addAtom = atom(null, (get: Getter, set: Setter, timeMs: number) => {
@@ -136,11 +136,10 @@ const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
 
 	const removeAtom = atom(null, (get: Getter, set: Setter, index: number) => {
 		const entries = get(entriesAtom);
-		let removed: AtomicEntry;
 
 		if (!index) return;
 		const newEntries = [...entries];
-		newEntries.splice(index, 1)[0];
+		newEntries.splice(index, 1);
 		set(entriesSrcAtom, newEntries);
 	});
 

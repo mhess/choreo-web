@@ -133,7 +133,7 @@ class YouTubePlayer extends PlatformPlayer {
 
 	async seekTo(ms: number) {
 		const posMs = ms < 0 ? 0 : ms;
-		// @ts-ignore: seekTo() call with 2 args seems to break the player
+		// @ts-expect-error: seekTo() call with 2 args seems to break the player
 		this.ytPlayer.seekTo(posMs / 1000);
 		this._tick(posMs);
 	}
