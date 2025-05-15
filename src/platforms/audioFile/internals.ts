@@ -52,7 +52,7 @@ export const useAudioFilePlayer = () => {
 
 		setPlayer(new AudioFilePlayer($audioEl, file, setStatus, setPaused));
 		() => file && setStatus(FilePlayerStatus.LOADING);
-	}, [file]);
+	}, [file, setPaused, setPlayer, setStatus]);
 
 	return { status, setFile };
 };
