@@ -2,5 +2,5 @@
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"editor.formatOnSave": true,
 	"editor.codeActionsOnSave": { "source.fixAll": "always" },
-	"tailwindCSS.experimental.classRegex": ["tw`([^`]*)"]
+	"tailwindCSS.experimental.classRegex": ["tw`([^`]+)"]
 }

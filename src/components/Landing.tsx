@@ -1,12 +1,17 @@
 import { useAtom } from "jotai";
 import { Button } from "react-aria-components";
+import clsx from "clsx";
 
 import { platformAtom } from "~/lib/platformAtoms";
 import { tw, useIsMobile } from "~/lib/utils";
+import { ctlBarBgStyles } from "~/styles";
 
 import { AudioFile, Spotify, YouTube } from "./Logos";
 
-const btnStyles = tw`flex items-center rounded border border-zinc-800 bg-teal-100 px-6 py-2 hover:brightness-95 dark:bg-teal-900 dark:hover:brightness-110`;
+const btnStyles = clsx(
+	ctlBarBgStyles,
+	tw`flex items-center rounded border border-zinc-400 px-4 py-1 hover:brightness-95 dark:border-zinc-600 dark:hover:brightness-110`,
+);
 
 export default function Landing() {
 	const isMobile = useIsMobile();

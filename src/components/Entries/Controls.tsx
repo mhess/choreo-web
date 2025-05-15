@@ -1,31 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import {
-	IconHelp,
 	IconPlayerPause,
 	IconPlayerPlay,
 	IconPlaylistAdd,
 	IconRewindBackward5,
 	IconRewindForward5,
-	IconX,
 } from "@tabler/icons-react";
-import { Button, Dialog, DialogTrigger, Popover } from "react-aria-components";
+import { Button } from "react-aria-components";
 import clsx from "clsx";
 
 import type { OnTickCallback } from "~/lib/player";
 import { displayMs, tw, useIsMobile } from "~/lib/utils";
 import { playerPausedAtom, useEstablishedPlayer } from "~/lib/platformAtoms";
 import { entryAtomsForPlatformAtom } from "~/lib/entries";
-import { ctlBarStyles, menuButtonStyles } from "~/styles";
+import { ctlBarStyles } from "~/styles";
+
 import TooltipWithClick from "~/components/TooltipWithClick";
+
+import HelpButton from "./HelpButton";
 
 const ctlBtnStyles = tw`rounded border border-zinc-600 bg-slate-50 hover:brightness-[98%] dark:bg-slate-800 dark:hover:brightness-110`;
 
-const playbackBtnStyles = clsx(ctlBtnStyles, tw`px-2`);
+interface Props {
+	help: { isShowing: boolean; toggle: () => void };
+}
 
-type Help = { isShowing: boolean; toggle: () => void };
-
-export default function Controls({ help }: { help: Help }) {
+export default function Controls(props: Props) {
+	const { help } = props;
 	const isMobile = useIsMobile();
 	const [{ addAtom }] = useAtom(entryAtomsForPlatformAtom);
 	const [, addEntry] = useAtom(addAtom);
@@ -82,51 +84,6 @@ const TrackTime = () => {
 	);
 };
 
-const LS_NO_HELP_KEY = "autoHelp";
-
-const HelpButton = ({ help }: { help: Help }) => {
-	const [isTooltipOpen, setIsTooltipOpen] = useState(false);
-
-	const closeTooltip = () => {
-		if (isTooltipOpen) localStorage.setItem(LS_NO_HELP_KEY, "true");
-		setIsTooltipOpen(false);
-	};
-
-	const handleClick = () => {
-		closeTooltip();
-		help.toggle();
-	};
-
-	useEffect(() => {
-		const noHelp = !!localStorage.getItem(LS_NO_HELP_KEY);
-		if (!noHelp) setIsTooltipOpen(true);
-	}, []);
-
-	return (
-		<DialogTrigger isOpen={isTooltipOpen}>
-			<Button
-				className={clsx(menuButtonStyles, "px-2 py-1 text-sm")}
-				onPress={handleClick}
-			>
-				{help.isShowing ? "Hide" : "Show"} Help
-				<IconHelp size="1.25rem" className="ml-1" />
-			</Button>
-			<Popover offset={8}>
-				<Dialog className="animate-pulse rounded bg-orange-300 px-4 py-2 pr-7 pt-3 dark:bg-orange-500">
-					<Button
-						onPress={closeTooltip}
-						className="absolute right-1 top-1 p-1"
-						aria-label="Close dialog"
-					>
-						<IconX size="1rem" />
-					</Button>
-					First time here? Click below to toggle the help messages!
-				</Dialog>
-			</Popover>
-		</DialogTrigger>
-	);
-};
-
 const PlaybackButtons = () => {
 	const isMobile = useIsMobile();
 	const player = useEstablishedPlayer();
@@ -138,7 +95,7 @@ const PlaybackButtons = () => {
 	};
 
 	const btnStyles = clsx(
-		playbackBtnStyles,
+		ctlBtnStyles,
 		isMobile ? tw`px-4 py-2` : tw`px-2 py-1`,
 	);
 

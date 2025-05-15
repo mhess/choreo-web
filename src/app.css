@@ -17,7 +17,7 @@
 	}
 
 	input {
-		@apply bg-zinc-50 outline-none outline-1 focus-visible:outline-cyan-700 dark:bg-gray-800 dark:focus-visible:outline-orange-400;
+		@apply bg-zinc-50 outline-none outline-1 focus-visible:outline-cyan-700 dark:bg-gray-700 dark:focus-visible:outline-orange-400;
 	}
 
 	button,
