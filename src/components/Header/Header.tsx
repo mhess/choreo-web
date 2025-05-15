@@ -1,6 +1,5 @@
 import { useAtom } from "jotai";
 import React, { useState } from "react";
-import { useComputedColorScheme, useMantineColorScheme } from "@mantine/core";
 import {
 	MenuTrigger,
 	Tooltip,
@@ -17,7 +16,7 @@ import {
 } from "~/lib/platformAtoms";
 import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
-import { useIsMobile } from "~/lib/utils";
+import { useIsMobile, useColorScheme } from "~/lib/utils";
 import TooltipWithClick from "~/components/TooltipWithClick";
 
 import SelectPlatformButton from "./SelectPlatformButton";
@@ -121,17 +120,16 @@ const BurgerMenu = () => {
 };
 
 const ToggleColorScheme = () => {
-	const { toggleColorScheme } = useMantineColorScheme();
-	const isLight = useComputedColorScheme() === "light";
+	const { isDark, toggle } = useColorScheme();
 
 	return (
 		<TooltipTrigger delay={500}>
 			<Button
 				className={`${menuButtonStyles} px-2 py-1`}
 				aria-label="Toggle light/dark mode"
-				onPress={toggleColorScheme}
+				onPress={toggle}
 			>
-				{React.createElement(isLight ? IconSun : IconMoon, { size: "1.25rem" })}
+				{React.createElement(isDark ? IconMoon : IconSun, { size: "1.25rem" })}
 			</Button>
 			<Tooltip className={`${menuStyles} text-sm`} offset={8}>
 				Toggle light/dark mode

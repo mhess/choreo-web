@@ -4,27 +4,16 @@ import {
 	type ChangeEvent,
 	type PropsWithChildren,
 } from "react";
-import {
-	Button,
-	Flex,
-	Stack,
-	useComputedColorScheme,
-	useMantineTheme,
-} from "@mantine/core";
-
-import { FilePlayerStatus, useAudioFilePlayer } from "./internals";
+import { Button } from "react-aria-components";
 
 import CenteredLoading from "~/components/CenteredLoading";
 
+import { FilePlayerStatus, useAudioFilePlayer } from "./internals";
+import { actionBtnStyles } from "~/styles";
+
 export default function AudioFileEditor({ children }: PropsWithChildren) {
 	const { status, setFile } = useAudioFilePlayer();
-	const scheme = useComputedColorScheme();
-	const theme = useMantineTheme();
 	const fileInputRef = useRef<HTMLInputElement>();
-
-	const isDark = scheme === "dark";
-	const logoDark = theme.colors.grape[5];
-	const logoLight = theme.colors.violet[9];
 
 	const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const file = e.target?.files?.[0];
@@ -38,24 +27,22 @@ export default function AudioFileEditor({ children }: PropsWithChildren) {
 			return <CenteredLoading message="Waiting for data" />;
 		case FilePlayerStatus.NO_FILE:
 			return (
-				<Flex justify="center" mt="2rem">
-					<Stack>
+				<div className="mt-8 flex justify-center">
+					<div className="flex flex-col">
 						<Button
-							color={isDark ? logoDark : logoLight}
-							size="md"
-							variant="filled"
-							onClick={() => fileInputRef.current?.click()}
+							className={actionBtnStyles}
+							onPress={() => fileInputRef.current?.click()}
 						>
 							Select an audio file
 						</Button>
 						<input
-							style={{ visibility: "hidden" }}
+							className="hidden"
 							ref={fileInputRef as MutableRefObject<HTMLInputElement>}
 							type="file"
 							onChange={handleFileChange}
 						/>
-					</Stack>
-				</Flex>
+					</div>
+				</div>
 			);
 	}
 }

@@ -10,7 +10,6 @@ import { withStore } from "~/test/utils";
 import type { PlatformPlayer } from "~/lib/player";
 
 import Entry from "./Entry";
-import classes from "./Entry.module.css";
 
 describe("Entry", () => {
 	const platform: Platform = "spotify";
@@ -23,8 +22,6 @@ describe("Entry", () => {
 		getStore,
 		setPlatform,
 	} = withStore();
-
-	let atoms: ReturnType<typeof getAtoms>;
 
 	const exampleEntry = {
 		timeMs: 12340,
@@ -94,13 +91,14 @@ describe("Entry", () => {
 	});
 
 	it("Is highlighted when current", async () => {
+		const highlightClass = "bg-orange-300";
 		const { entry } = arrange([exampleEntry], 0);
 
-		expect(screen.getByRole("row")).not.toHaveClass(classes.highlight);
+		expect(screen.getByRole("row")).not.toHaveClass(highlightClass);
 
 		await act(() => setAtoms([[entry.isCurrentAtom, true]]));
 
-		expect(screen.getByRole("row")).toHaveClass(classes.highlight);
+		expect(screen.getByRole("row")).toHaveClass(highlightClass);
 	});
 
 	it("Correctly modifies the count", async () => {

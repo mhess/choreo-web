@@ -13,4 +13,5 @@ export default [
 	// https://github.com/jsx-eslint/eslint-plugin-react/#configuration-new-eslintconfigjs
 	pluginReact.configs.flat.recommended,
 	pluginReact.configs.flat["jsx-runtime"],
+	{ settings: { tailwindcss: { tags: ["tw"] } } },
 ];

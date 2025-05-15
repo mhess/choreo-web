@@ -58,6 +58,9 @@ const assertScriptAndInvokeCallback = () => {
 	window.onSpotifyWebPlaybackSDKReady();
 };
 
+const connectDeviceMsg =
+	/^Please connect to the \SChoreo Player\S device in the Spotify player.$/;
+
 describe("Spotify", () => {
 	const { wrapper, getAtoms, setAtoms, getStore } = withStore();
 	let spotifyPlayer: FakeSpotifyPlayer;
@@ -166,11 +169,7 @@ describe("Spotify", () => {
 
 		assertScriptAndInvokeCallback();
 
-		await expectOnly(container, () =>
-			screen.getByText(
-				`Please connect to the "Choreo Player" device in the Spotify player.`,
-			),
-		);
+		await expectOnly(container, () => screen.getByText(connectDeviceMsg));
 
 		afterPlayerCreation();
 
@@ -214,11 +213,7 @@ describe("Spotify", () => {
 
 		assertScriptAndInvokeCallback();
 
-		await expectOnly(container, () =>
-			screen.getByText(
-				`Please connect to the "Choreo Player" device in the Spotify player.`,
-			),
-		);
+		await expectOnly(container, () => screen.getByText(connectDeviceMsg));
 
 		expect(screen.queryByTestId("entries")).not.toBeInTheDocument();
 
@@ -355,11 +350,7 @@ describe("Spotify", () => {
 
 		assertScriptAndInvokeCallback();
 
-		await expectOnly(container, () =>
-			screen.getByText(
-				`Please connect to the "Choreo Player" device in the Spotify player.`,
-			),
-		);
+		await expectOnly(container, () => screen.getByText(connectDeviceMsg));
 
 		expect(Spotify.Player).toHaveBeenCalledOnce();
 	});

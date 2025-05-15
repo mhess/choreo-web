@@ -17,16 +17,13 @@
 	}
 
 	input {
-		@apply outline-none focus-visible:outline-cyan-700 dark:focus-visible:outline-orange-400;
+		@apply bg-zinc-50 outline-none outline-1 focus-visible:outline-cyan-700 dark:bg-gray-800 dark:focus-visible:outline-orange-400;
 	}
 
 	button,
-	[role="menuitem"] {
+	[role="menuitem"],
+	[role="dialog"] {
 		@apply outline-none data-[focus-visible]:outline-blue-700 dark:data-[focus-visible]:outline-orange-400;
-	}
-
-	input {
-		@apply bg-zinc-50 dark:bg-gray-800;
 	}
 }
 

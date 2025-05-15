@@ -14,7 +14,7 @@ import { displayMs } from "~/lib/utils";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { entryAtomsForPlatformAtom, type AtomicEntry } from "~/lib/entries";
 import InputWithAtom from "~/components/TextInputWithAtom";
-import { menuStyles } from "~/styles";
+import { actionBtnStyles, menuStyles } from "~/styles";
 
 import { COUNT_LABEL, NOTE_LABEL } from "./shared";
 
@@ -50,7 +50,6 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 								<Button
 									className="absolute top-0.5 cursor-pointer text-blue-600 hover:text-blue-300 dark:text-blue-400"
 									aria-label="Fill in the rest of entry counts"
-									// onPress={openFillModal}
 								>
 									<IconArrowMoveDown
 										style={{ width: "18px" }}
@@ -67,7 +66,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 							<Dialog className="max-w-lg overflow-auto rounded-md bg-zinc-100 p-8 outline-none dark:bg-zinc-700">
 								{({ close }) => (
 									<div>
-										<Heading className="mb-4 text-xl">
+										<Heading slot="title" className="mb-4 text-xl">
 											Fill in the rest?
 										</Heading>
 										<div className="flex flex-col gap-4">
@@ -76,9 +75,8 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 												previous entry to fill in the rest of the counts?
 											</p>
 											<div className="flex justify-end gap-4">
-												{/* TODO: Maybe use app purple color? */}
 												<Button
-													className="rounded border border-zinc-600 bg-violet-400 px-4 py-2 hover:brightness-95 dark:bg-violet-800 dark:hover:brightness-110"
+													className={actionBtnStyles}
 													onPress={handleClickFillRest(close)}
 												>
 													Yes
