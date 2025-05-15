@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
-import { ButtonProps } from "react-aria-components";
+import { ButtonProps, Button } from "react-aria-components";
 
-import Button from "~/components/Button";
 import { tw } from "~/lib/utils";
 
 const lineStyles = tw`h-[2px] w-full rounded-full bg-zinc-800 transition duration-[0.25s] dark:bg-zinc-50`;
