@@ -44,8 +44,3 @@
 .timestamp:hover {
   color: var(--mantine-color-blue-9);
 }
-
-.countInput {
-  width: var(--count-width);
-  text-align: right;
-}

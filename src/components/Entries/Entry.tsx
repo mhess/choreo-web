@@ -14,8 +14,9 @@ import { useDisclosure } from "@mantine/hooks";
 import { displayMs } from "~/lib/utils";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { entryAtomsForPlatformAtom, type AtomicEntry } from "~/lib/entries";
+import { COUNT_LABEL, NOTE_LABEL } from "./Entries";
 
-import TextInputWithAtom from "~/components/TextInputWithAtom";
+import InputWithAtom from "~/components/TextInputWithAtom";
 
 import classes from "./Entry.module.css";
 
@@ -72,32 +73,34 @@ export default function Entry({
 					</Group>
 				</Stack>
 			</Modal>
-			<TextInputWithAtom
-				aria-label="count"
-				leftSection={
-					canFill ? (
-						<Tooltip
-							openDelay={750}
-							w={211}
-							label="Use the timing of this and the previous entry to fill in counts for the remaining entries"
-							multiline
-						>
-							<IconArrowMoveDown
-								className={classes.fillBtn}
-								viewBox="2 4 20 16"
-								role="button"
-								aria-label="Fill in the rest of entry counts"
-								onClick={openFillModal}
-							/>
-						</Tooltip>
-					) : undefined
-				}
-				leftSectionWidth="22"
-				classNames={{ input: classes.countInput }}
-				min={0}
-				type="number"
-				atom={countAtom as Parameters<typeof TextInputWithAtom>[0]["atom"]}
-			/>
+			<div className="relative">
+				{canFill ? (
+					<Tooltip
+						openDelay={750}
+						w={211}
+						label="Use the timing of this and the previous entry to fill in counts for the remaining entries"
+						multiline
+					>
+						<IconArrowMoveDown
+							className="absolute top-0 cursor-pointer hover:text-blue-300"
+							style={{ width: "18px" }}
+							viewBox="2 4 20 16"
+							role="button"
+							aria-label="Fill in the rest of entry counts"
+							onClick={openFillModal}
+						/>
+					</Tooltip>
+				) : undefined}
+				<InputWithAtom
+					className="w-16 rounded text-right px-2 py-0.5"
+					aria-label={COUNT_LABEL}
+					// leftSectionWidth="22"
+					// classNames={{ input: classes.countInput }}
+					// min={0}
+					type="number"
+					atom={countAtom}
+				/>
+			</div>
 			<Text
 				role="button"
 				aria-label={`Seek to ${displayTime}`}
@@ -107,11 +110,10 @@ export default function Entry({
 			>
 				{displayTime}
 			</Text>
-			<TextInputWithAtom
-				aria-label="note"
-				flex={1}
-				mr="0.5rem"
-				atom={noteAtom as Parameters<typeof TextInputWithAtom>[0]["atom"]}
+			<InputWithAtom
+				className="rounded px-2 py-0.5 flex-1 mr-2"
+				aria-label={NOTE_LABEL}
+				atom={noteAtom}
 			/>
 			<CloseButton
 				aria-label="Delete Entry"

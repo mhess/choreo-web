@@ -141,15 +141,8 @@ const BurgerMenu = () => {
 };
 
 const ToggleColorScheme = () => {
-	const [canRenderIcon, setCanRenderIcon] = useState(false);
 	const { toggleColorScheme } = useMantineColorScheme();
 	const isLight = useComputedColorScheme() === "light";
-
-	useEffect(() => {
-		// Icon can only be rendered on browser because server doesn't have access
-		// to scheme state in localStorage
-		setCanRenderIcon(true);
-	}, []);
 
 	return (
 		<Tooltip label="Toggle light/dark mode" w={173}>
@@ -158,11 +151,7 @@ const ToggleColorScheme = () => {
 				variant="outline"
 				onClick={toggleColorScheme}
 			>
-				{canRenderIcon ? (
-					React.createElement(isLight ? IconSun : IconMoon, { size: "1.25rem" })
-				) : (
-					<Box w="1.25rem" />
-				)}
+				{React.createElement(isLight ? IconSun : IconMoon, { size: "1.25rem" })}
 			</Button>
 		</Tooltip>
 	);
