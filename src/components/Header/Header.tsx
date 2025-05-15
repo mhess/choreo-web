@@ -2,10 +2,7 @@ import { useAtom } from "jotai";
 import React, { useState } from "react";
 import { useComputedColorScheme, useMantineColorScheme } from "@mantine/core";
 import {
-	Dialog,
-	DialogTrigger,
 	MenuTrigger,
-	Popover,
 	Tooltip,
 	TooltipTrigger,
 	Button,
@@ -21,12 +18,13 @@ import {
 import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
 import { useIsMobile } from "~/lib/utils";
+import TooltipWithClick from "~/components/TooltipWithClick";
 
 import SelectPlatformButton from "./SelectPlatformButton";
 import MenuDropdown from "./MenuDropdown";
 import Hamburger from "./Hamburger";
 
-import { menuButtonStyles, menuStyles } from "~/styles";
+import { ctlBarStyles, menuButtonStyles, menuStyles } from "~/styles";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -42,7 +40,7 @@ export default function Header() {
 		(platform === "youtube" && !!ytVideoId);
 
 	return (
-		<header className="flex items-center border-b border-slate-800 bg-teal-50 px-4 py-1 dark:border-slate-500 dark:bg-teal-900">
+		<header className={`${ctlBarStyles} flex items-center border-b px-4 py-1`}>
 			<div className="flex min-w-0 flex-nowrap items-center gap-4">
 				<Button
 					onPress={() => setPlatform("landing")}
@@ -53,7 +51,7 @@ export default function Header() {
 				{player && <TrackInfo />}
 			</div>
 			<div
-				className={`mr-2 flex grow flex-nowrap ${isSpotify && player ? "justify-between" : "justify-end"}`}
+				className={`mr-4 flex grow flex-nowrap ${isSpotify && player ? "justify-between" : "justify-end"}`}
 			>
 				{shouldShowActions && (
 					<>
@@ -97,35 +95,17 @@ const TrackInfo = () => {
 	);
 };
 
-const changeMsg = "Use a Spotify desktop or mobile app to change the track.";
-
 const SpotifyChangeButton = () => {
 	const [player] = useAtom(playerAtom);
-	const isMobile = useIsMobile();
-	const button = (
-		<Button
-			className={`${menuButtonStyles} relative -top-1 mx-2 h-4 px-1 text-[0.5rem] font-bold`}
-		>
-			Change?
-		</Button>
-	);
 
-	return !player ? null : isMobile ? (
-		<DialogTrigger>
-			{button}
-			<Popover offset={8}>
-				<Dialog className={`${menuStyles} max-w-xs`}>
-					<p>{changeMsg}</p>
-				</Dialog>
-			</Popover>
-		</DialogTrigger>
-	) : (
-		<TooltipTrigger delay={0}>
-			{button}
-			<Tooltip className={`${menuStyles} max-w-xs`} offset={8}>
-				{changeMsg}
-			</Tooltip>
-		</TooltipTrigger>
+	return !player ? null : (
+		<TooltipWithClick tooltip="Use a Spotify desktop or mobile app to change the track.">
+			<Button
+				className={`${menuButtonStyles} relative -top-1 mx-2 h-4 px-1 text-[0.5rem] font-bold`}
+			>
+				Change?
+			</Button>
+		</TooltipWithClick>
 	);
 };
 

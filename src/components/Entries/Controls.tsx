@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { Button, Group, Text, Tooltip } from "@mantine/core";
-import type { PolymorphicComponentProps, BoxProps } from "@mantine/core";
+import { Tooltip } from "@mantine/core";
 import {
 	IconHelp,
 	IconPlayerPause,
@@ -10,15 +9,21 @@ import {
 	IconRewindBackward5,
 	IconRewindForward5,
 } from "@tabler/icons-react";
+import { Button } from "react-aria-components";
+import clsx from "clsx";
 
 import type { OnTickCallback } from "~/lib/player";
-import { displayMs, useIsMobile } from "~/lib/utils";
+import { displayMs, tw, useIsMobile } from "~/lib/utils";
 import { playerPausedAtom, useEstablishedPlayer } from "~/lib/platformAtoms";
 import { entryAtomsForPlatformAtom } from "~/lib/entries";
-
+import { ctlBarStyles, menuButtonStyles } from "~/styles";
 import TooltipWithClick from "~/components/TooltipWithClick";
 
 import classes from "./Controls.module.css";
+
+const ctlBtnStyles = tw`rounded border border-zinc-600 bg-slate-50 hover:brightness-[98%] dark:bg-slate-800 dark:hover:brightness-110`;
+
+const playbackBtnStyles = clsx(ctlBtnStyles, tw`px-2`);
 
 type Help = { isShowing: boolean; toggle: () => void };
 
@@ -34,28 +39,29 @@ export default function Controls({ help }: { help: Help }) {
 	};
 
 	return (
-		<Group className={classes.controlBar} role="toolbar" aria-label="Controls">
-			<Group>
-				<Group className={classes.desktopLeftSide}>
-					<TrackTime />
-					{!isMobile && <PlaybackButtons />}
-				</Group>
+		<div
+			className={clsx(
+				ctlBarStyles,
+				isMobile ? "flex-col gap-4 pb-3" : "justify-between",
+				"flex items-center border-t px-4 py-2",
+			)}
+			role="toolbar"
+			aria-label="Controls"
+		>
+			<span className={clsx("flex items-center", isMobile ? "gap-4" : "gap-8")}>
+				<TrackTime />
+				{!isMobile && <PlaybackButtons />}
 				<Button
-					classNames={{ label: classes.btnLabel }}
-					px="1.5rem"
-					ml={!isMobile ? "md" : undefined}
-					size={isMobile ? "md" : undefined}
-					onClick={handleAddEntry}
-					title="Add Entry"
+					className={clsx(ctlBtnStyles, isMobile ? "px-6 py-2" : "px-4 py-1")}
+					onPress={handleAddEntry}
+					aria-label="Add Entry"
 				>
 					<IconPlaylistAdd size="1.25rem" />
 				</Button>
-			</Group>
-			{isMobile && <PlaybackButtons hiddenFrom="mobile" />}
-			<Group mt={isMobile ? "0.5rem" : undefined}>
-				<HelpButton help={help} />
-			</Group>
-		</Group>
+			</span>
+			{isMobile && <PlaybackButtons />}
+			<HelpButton help={help} />
+		</div>
 	);
 }
 
@@ -70,10 +76,10 @@ const TrackTime = () => {
 	}, [player]);
 
 	return (
-		<TooltipWithClick label="Current track time">
-			<Text span className={classes.timeDisplay}>
+		<TooltipWithClick tooltip="Current track time">
+			<span className="flex h-6 w-[5.5rem] items-center justify-end rounded bg-zinc-50 px-2 font-mono text-sm dark:bg-zinc-800">
 				{displayMs(timeMs)}
-			</Text>
+			</span>
 		</TooltipWithClick>
 	);
 };
@@ -105,7 +111,10 @@ const HelpButton = ({ help }: { help: Help }) => {
 			color="orange"
 			label="First time here? Click below to toggle the help messages!"
 		>
-			<Button variant="outline" onClick={handleClick}>
+			<Button
+				className={clsx(menuButtonStyles, "px-2 py-1 text-sm")}
+				onPress={handleClick}
+			>
 				{help.isShowing ? "Hide" : "Show"} Help
 				<IconHelp size="1.25rem" style={{ marginLeft: "0.25rem" }} />
 			</Button>
@@ -113,42 +122,46 @@ const HelpButton = ({ help }: { help: Help }) => {
 	);
 };
 
-const PlaybackButtons = (props: PolymorphicComponentProps<"div", BoxProps>) => {
+const PlaybackButtons = () => {
 	const isMobile = useIsMobile();
 	const player = useEstablishedPlayer();
 	const [paused] = useAtom(playerPausedAtom);
 
-	const handleSeekDir = (ms: number) => async () => {
+	const handleSeekDir = (deltaMs: number) => async () => {
 		const time = await player.getCurrentTime();
-		player.seekTo(ms + time);
+		player.seekTo(deltaMs + time);
 	};
 
-	const btnProps = {
-		classNames: { label: classes.btnLabel },
-		size: isMobile ? "md" : undefined,
-	};
+	const btnStyles = clsx(
+		playbackBtnStyles,
+		isMobile ? tw`px-4 py-2` : tw`px-2 py-1`,
+	);
 
 	return (
-		<Group {...props} className={classes.playback}>
-			<Button onClick={handleSeekDir(-5000)} title="Rewind 5 sec" {...btnProps}>
+		<span className="flex gap-2">
+			<Button
+				onPress={handleSeekDir(-5000)}
+				aria-label="Rewind 5 sec"
+				className={btnStyles}
+			>
 				<IconRewindBackward5 size="1.25rem" />
 			</Button>
 			<Button
-				onClick={() => player[paused ? "play" : "pause"]()}
-				title={paused ? "Play" : "Pause"}
-				{...btnProps}
+				onPress={() => player[paused ? "play" : "pause"]()}
+				aria-label={paused ? "Play" : "Pause"}
+				className={btnStyles}
 			>
 				{React.createElement(paused ? IconPlayerPlay : IconPlayerPause, {
 					size: "1rem",
 				})}
 			</Button>
 			<Button
-				onClick={handleSeekDir(5000)}
-				title="Fast-forward 5 sec"
-				{...btnProps}
+				onPress={handleSeekDir(5000)}
+				aria-label="Fast-forward 5 sec"
+				className={btnStyles}
 			>
 				<IconRewindForward5 size="1.25rem" />
 			</Button>
-		</Group>
+		</span>
 	);
 };

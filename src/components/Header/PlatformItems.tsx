@@ -38,8 +38,8 @@ export default function PlatformItems() {
 }
 
 export const logoByPlatform: Record<Platform, React.ReactNode> = {
-	spotify: <Spotify />,
-	youtube: <YouTube />,
+	spotify: <Spotify className="h-4" />,
+	youtube: <YouTube className="h-4" />,
 	audioFile: <AudioFile />,
 	landing: undefined,
 };
