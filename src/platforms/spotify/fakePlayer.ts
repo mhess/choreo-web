@@ -1,4 +1,4 @@
-// biome-ignore lint/suspicious/noExplicitAny: necessary
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ListenerFunction = (...args: any[]) => void;
 
 class EventEmitter {
@@ -8,19 +8,15 @@ class EventEmitter {
 		this._listeners = {};
 	}
 
-	on(event: string, listener: ListenerFunction) {
+	addListener(event: string, listener: ListenerFunction) {
 		if (!this._listeners[event]) {
 			this._listeners[event] = [];
 		}
 		this._listeners[event].push(listener);
-		return () => this.off(event, listener); // Return a function to unsubscribe
+		return () => this.removeListener(event, listener);
 	}
 
-	addListener(...args: Parameters<EventEmitter["on"]>) {
-		return this.on(...args);
-	}
-
-	off(event: string, listener?: ListenerFunction) {
+	removeListener(event: string, listener?: ListenerFunction) {
 		if (this._listeners[event]) {
 			if (listener)
 				this._listeners[event] = this._listeners[event].filter(
@@ -28,10 +24,6 @@ class EventEmitter {
 				);
 			else delete this._listeners[event];
 		}
-	}
-
-	removeListener(...args: Parameters<EventEmitter["off"]>) {
-		this.off(...args);
 	}
 
 	emit(event: string, ...args: Parameters<ListenerFunction>) {

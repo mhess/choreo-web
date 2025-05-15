@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
 
-// @ts-ignore
+// @ts-expect-error shutup ts
 global.Blob = class Blob {
 	bits: string[];
 	type: string;
@@ -17,7 +17,7 @@ global.Blob = class Blob {
 	}
 };
 
-// @ts-ignore
+// @ts-expect-error shutup ts
 global.File = class File extends Blob {
 	name: string;
 

@@ -1,6 +1,6 @@
-import { SpotifyPlayerStatus, useSpotifyPlayer } from "./internals";
-
 import Loading from "~/components/Loading";
+
+import { SpotifyPlayerStatus, useSpotifyPlayer } from "./internals";
 
 export default function Spotify({
 	token,

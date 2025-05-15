@@ -6,7 +6,7 @@ import {
 } from "react";
 import { Button } from "react-aria-components";
 
-import CenteredLoading from "~/components/CenteredLoading";
+import Loading from "~/components/Loading";
 
 import { FilePlayerStatus, useAudioFilePlayer } from "./internals";
 import { actionBtnStyles } from "~/styles";
@@ -24,7 +24,7 @@ export default function AudioFileEditor({ children }: PropsWithChildren) {
 		case FilePlayerStatus.READY:
 			return children;
 		case FilePlayerStatus.LOADING:
-			return <CenteredLoading message="Waiting for data" />;
+			return <Loading message="Waiting for data" />;
 		case FilePlayerStatus.NO_FILE:
 			return (
 				<div className="mt-8 flex justify-center">
