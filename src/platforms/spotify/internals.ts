@@ -7,6 +7,11 @@ import { spotifyTokenParam } from "~/../shared";
 import { FakeSpotifyPlayer } from "./fakePlayer";
 import { PlatformPlayer, getPlatformAtoms } from "~/lib/player";
 
+declare global {
+	interface Window {
+		spotifyPromise: Promise<SpotifyPlayer>;
+	}
+}
 export enum SpotifyPlayerStatus {
 	LOGGED_OUT = "loggedOut",
 	LOADING = "loading",
@@ -97,42 +102,49 @@ const getSpotifyPlayer = async (
 		$script.id = SPOTIFY_SCRIPT_ID;
 		$script.src = "https://sdk.scdn.co/spotify-player.js";
 		document.body.appendChild($script);
-	}
+	} else return window.spotifyPromise;
 
-	return new Promise((resolve) => {
+	window.spotifyPromise = new Promise<Spotify.Player>((resolve) => {
+		if (token === "fake")
+			return resolve(
+				new FakeSpotifyPlayer({
+					name: "Choreo Player",
+					getOAuthToken: (cb) => cb(token),
+					volume: 0.5,
+				}) as unknown as Spotify.Player,
+			);
+
 		window.onSpotifyWebPlaybackSDKReady = async () => {
-			const PlayerClass = (
-				token === "fake" ? FakeSpotifyPlayer : Spotify.Player
-			) as typeof Spotify.Player;
-
-			const player = new PlayerClass({
-				name: "Choreo Player",
-				getOAuthToken: (cb) => cb(token),
-				volume: 0.5,
-			});
-
-			player.addListener("playback_error", (obj) => {
-				console.error(`playback error ${JSON.stringify(obj)}`);
-				setStatus(SpotifyPlayerStatus.PLAYBACK_ERROR);
-			});
-			player.addListener("initialization_error", () =>
-				setStatus(SpotifyPlayerStatus.INIT_ERROR),
+			resolve(
+				new Spotify.Player({
+					name: "Choreo Player",
+					getOAuthToken: (cb) => cb(token),
+					volume: 0.5,
+				}),
 			);
-			player.addListener("authentication_error", () =>
-				setStatus(SpotifyPlayerStatus.AUTH_ERROR),
-			);
-			player.addListener("account_error", () =>
-				setStatus(SpotifyPlayerStatus.ACCT_ERROR),
-			);
-			player.addListener("ready", () =>
-				setStatus(SpotifyPlayerStatus.NOT_CONNECTED),
-			);
-
-			await new Promise((res) => setTimeout(res, 500));
-
-			resolve(new SpotifyPlayer(player, token, setState, setStatus));
 		};
+	}).then((player) => {
+		player.addListener("playback_error", (obj) => {
+			console.error(`playback error ${JSON.stringify(obj)}`);
+			setStatus(SpotifyPlayerStatus.PLAYBACK_ERROR);
+		});
+		player.addListener("initialization_error", () =>
+			setStatus(SpotifyPlayerStatus.INIT_ERROR),
+		);
+		player.addListener("authentication_error", () =>
+			setStatus(SpotifyPlayerStatus.AUTH_ERROR),
+		);
+		player.addListener("account_error", () =>
+			setStatus(SpotifyPlayerStatus.ACCT_ERROR),
+		);
+		player.addListener("ready", () =>
+			setStatus(SpotifyPlayerStatus.NOT_CONNECTED),
+		);
+
+		return new SpotifyPlayer(player, token, setState, setStatus);
 	});
+
+	return window.spotifyPromise;
 };
 
 class SpotifyPlayer extends PlatformPlayer {

@@ -1,13 +1,7 @@
 import { useAtom } from "jotai";
 import React, { useState } from "react";
-import {
-	Group,
-	Text,
-	Tooltip,
-	useComputedColorScheme,
-	useMantineColorScheme,
-} from "@mantine/core";
-import { MenuTrigger } from "react-aria-components";
+import { useComputedColorScheme, useMantineColorScheme } from "@mantine/core";
+import { MenuTrigger, Tooltip, TooltipTrigger } from "react-aria-components";
 
 import { IconChevronDown, IconMoon, IconSun } from "@tabler/icons-react";
 
@@ -27,8 +21,7 @@ import MenuDropdown from "./MenuDropdown";
 import Hamburger from "./Hamburger";
 import Button from "~/components/Button";
 
-import classes from "./Header.module.css";
-import { menuButtonStyles } from "./styles";
+import { menuButtonStyles, menuStyles } from "./styles";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -45,7 +38,7 @@ export default function Header() {
 
 	return (
 		<header className="flex items-center border-b border-slate-800 bg-emerald-50 px-4 py-1 dark:border-slate-500 dark:bg-teal-900">
-			<div className="flex min-w-0 flex-nowrap gap-4">
+			<div className="flex min-w-0 flex-nowrap items-center gap-4">
 				<Button
 					onPress={() => setPlatform("landing")}
 					className="p-2 text-lg font-bold uppercase text-violet-900 dark:text-purple-300"
@@ -54,9 +47,8 @@ export default function Header() {
 				</Button>
 				{player && <TrackInfo />}
 			</div>
-			<Group
-				className={classes.headerRightSide}
-				justify={isSpotify && player ? "space-between" : "right"}
+			<div
+				className={`mr-2 flex grow flex-nowrap ${isSpotify && player ? "justify-between" : "justify-end"}`}
 			>
 				{shouldShowActions && (
 					<>
@@ -72,12 +64,12 @@ export default function Header() {
 						)}
 					</>
 				)}
-			</Group>
-			<Group gap="xs">
+			</div>
+			<div className="flex gap-3">
 				{!isMobile && <SelectPlatformButton />}
 				{!isMobile && <ToggleColorScheme />}
 				{isMobile && <BurgerMenu />}
-			</Group>
+			</div>
 		</header>
 	);
 }
@@ -87,17 +79,14 @@ const TrackInfo = () => {
 	const [trackName] = useAtom(trackNameAtom);
 
 	return (
-		<Text className={classes.trackInfo} span>
+		<span className="flex-nowrap overflow-hidden text-ellipsis">
 			{artist.length > 0 && (
 				<>
-					<Text fw={700} span>
-						{artist}
-					</Text>
-					:{" "}
+					<b>{artist}</b>:{" "}
 				</>
 			)}
 			{trackName}
-		</Text>
+		</span>
 	);
 };
 
@@ -112,7 +101,7 @@ const SpotifyChangeButton = () => {
 			label="Use a Spotify desktop or mobile app to change the track."
 		>
 			<Button
-				className={`${menuButtonStyles} relative -top-1 mx-2 h-4 px-2 text-[0.625rem]`}
+				className={`relative -top-1 mx-2 h-4 px-1 text-[0.5rem] font-bold ${menuButtonStyles}`}
 			>
 				Change?
 			</Button>
@@ -125,11 +114,7 @@ const BurgerMenu = () => {
 
 	return (
 		<MenuTrigger onOpenChange={setIsOpened}>
-			<Hamburger
-				onHoverChange={(state) => console.log({ state })}
-				opened={isOpened}
-				aria-label="Toggle menu"
-			/>
+			<Hamburger opened={isOpened} aria-label="Toggle menu" />
 			<MenuDropdown />
 		</MenuTrigger>
 	);
@@ -140,7 +125,7 @@ const ToggleColorScheme = () => {
 	const isLight = useComputedColorScheme() === "light";
 
 	return (
-		<Tooltip label="Toggle light/dark mode" w={173}>
+		<TooltipTrigger delay={500}>
 			<Button
 				className={menuButtonStyles}
 				aria-label="Toggle light/dark mode"
@@ -148,6 +133,9 @@ const ToggleColorScheme = () => {
 			>
 				{React.createElement(isLight ? IconSun : IconMoon, { size: "1.25rem" })}
 			</Button>
-		</Tooltip>
+			<Tooltip className={`${menuStyles} text-sm`} offset={8}>
+				Toggle light/dark mode
+			</Tooltip>
+		</TooltipTrigger>
 	);
 };

@@ -82,7 +82,7 @@ describe("Header", () => {
 					name: "Select Platform",
 				});
 
-				await user.hover(selectPlatformBtn);
+				await user.click(selectPlatformBtn);
 
 				const menuItems = await screen.findAllByRole("menuitem");
 
@@ -150,7 +150,7 @@ describe("Header", () => {
 				setAtoms([[spotifyTokenAtom, "auth-token-value"]]);
 				render(<Header />, { wrapper });
 
-				await user.hover(screen.getByRole("button", { name: "Actions" }));
+				await user.click(screen.getByRole("button", { name: "Actions" }));
 
 				await user.click(
 					await screen.findByRole("menuitem", { name: "Log out of Spotify" }),
@@ -173,7 +173,7 @@ describe("Header", () => {
 				const fileInput = screen.getByLabelText("Upload CSV");
 				fileInput.onclick = vi.fn();
 
-				await user.hover(screen.getByRole("button", { name: "Actions" }));
+				await user.click(screen.getByRole("button", { name: "Actions" }));
 
 				await user.click(
 					await screen.findByRole("menuitem", {
@@ -253,7 +253,7 @@ describe("Header", () => {
 
 				render(<Header />, { wrapper });
 
-				await user.hover(screen.getByRole("button", { name: "Actions" }));
+				await user.click(screen.getByRole("button", { name: "Actions" }));
 
 				const handlerMock = vi.fn();
 
@@ -327,7 +327,7 @@ describe("Header", () => {
 					1000, 2000,
 				]);
 
-				await user.hover(screen.getByRole("button", { name: "Actions" }));
+				await user.click(screen.getByRole("button", { name: "Actions" }));
 
 				await user.click(
 					await screen.findByRole("menuitem", { name: "Clear entries" }),
