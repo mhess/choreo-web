@@ -48,6 +48,16 @@ const expectOnly = (
 		observer.observe(container, { childList: true, subtree: true });
 	});
 
+const assertScriptAndInvokeCallback = () => {
+	const scripts = document.body.getElementsByTagName("script");
+	expect(scripts).toHaveLength(1);
+	expect(scripts[0]).toHaveAttribute(
+		"src",
+		"https://sdk.scdn.co/spotify-player.js",
+	);
+	window.onSpotifyWebPlaybackSDKReady();
+};
+
 describe("Spotify", () => {
 	const { wrapper, getAtoms, setAtoms, getStore } = withStore();
 	let spotifyPlayer: FakeSpotifyPlayer;
@@ -73,6 +83,7 @@ describe("Spotify", () => {
 		vi.useRealTimers();
 		vi.restoreAllMocks();
 		localStorage.clear();
+		window.spotifyPromise = undefined;
 		document.body.innerHTML = "";
 	});
 
@@ -122,7 +133,7 @@ describe("Spotify", () => {
 
 		(spotifyPlayer.connect as Mock).mockReturnValue(Promise.resolve(false));
 
-		window.onSpotifyWebPlaybackSDKReady();
+		assertScriptAndInvokeCallback();
 
 		const msgEl = await expectOnly(container, () =>
 			screen.getByText(new RegExp(`^${msg}`)),
@@ -153,7 +164,7 @@ describe("Spotify", () => {
 
 		expect(screen.getByText("Connecting to Spotify")).toBeInTheDocument();
 
-		window.onSpotifyWebPlaybackSDKReady();
+		assertScriptAndInvokeCallback();
 
 		await expectOnly(container, () =>
 			screen.getByText(
@@ -201,7 +212,7 @@ describe("Spotify", () => {
 
 		await expect(noDomChange(container)).resolves.toBeTruthy();
 
-		window.onSpotifyWebPlaybackSDKReady();
+		assertScriptAndInvokeCallback();
 
 		await expectOnly(container, () =>
 			screen.getByText(
@@ -342,7 +353,7 @@ describe("Spotify", () => {
 			{ wrapper },
 		);
 
-		window.onSpotifyWebPlaybackSDKReady();
+		assertScriptAndInvokeCallback();
 
 		await expectOnly(container, () =>
 			screen.getByText(

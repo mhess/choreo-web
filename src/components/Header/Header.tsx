@@ -113,8 +113,8 @@ const SpotifyChangeButton = () => {
 	return !player ? null : isMobile ? (
 		<DialogTrigger>
 			{button}
-			<Popover className={`${menuStyles} max-w-xs`} offset={8}>
-				<Dialog>
+			<Popover offset={8}>
+				<Dialog className={`${menuStyles} max-w-xs`}>
 					<p>{changeMsg}</p>
 				</Dialog>
 			</Popover>
