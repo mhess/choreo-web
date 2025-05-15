@@ -85,14 +85,14 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(postcss@8.4.41)
       typescript:
-        specifier: ^5.6.2
-        version: 5.6.2
+        specifier: ^5.6.3
+        version: 5.6.3
       vite:
         specifier: ^5.4.2
         version: 5.4.2(@types/node@22.4.1)(sugarss@4.0.1(postcss@8.4.41))
       vite-tsconfig-paths:
         specifier: ^5.0.1
-        version: 5.0.1(typescript@5.6.2)(vite@5.4.2(@types/node@22.4.1)(sugarss@4.0.1(postcss@8.4.41)))
+        version: 5.0.1(typescript@5.6.3)(vite@5.4.2(@types/node@22.4.1)(sugarss@4.0.1(postcss@8.4.41)))
       vitest:
         specifier: ^2.0.5
         version: 2.0.5(@types/node@22.4.1)(jsdom@25.0.0)(sugarss@4.0.1(postcss@8.4.41))
@@ -987,6 +987,7 @@ packages:
     resolution: {integrity: sha512-Quz3MvAwHxVYNXsOByL7xI5EB2WYOeFswqaHIA3qOK3isRWTxiplBEocmmru6XmxDB2L7jDNYtYA4FyimoAFEw==}
     engines: {node: '>=8.17.0'}
     hasBin: true
+    bundledDependencies: []
 
   lodash.curry@4.1.1:
     resolution: {integrity: sha512-/u14pXGviLaweY5JI0IUzgzF2J6Ne8INyzAZjImcryjgkZ+ebruBxy2/JaOOkTqScddcYtakjhSaeemV8lR0tA==}
@@ -1361,8 +1362,8 @@ packages:
     resolution: {integrity: sha512-OduNjVJsFbifKb57UqZ2EMP1i4u64Xwow3NYXUtBbD4vIwJdQd4+xl8YDou1dlm4DVrtwT/7Ky8z8WyCULVfxw==}
     engines: {node: '>=16'}
 
-  typescript@5.6.2:
-    resolution: {integrity: sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==}
+  typescript@5.6.3:
+    resolution: {integrity: sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -2670,15 +2671,15 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  tsconfck@3.1.3(typescript@5.6.2):
+  tsconfck@3.1.3(typescript@5.6.3):
     optionalDependencies:
-      typescript: 5.6.2
+      typescript: 5.6.3
 
   tslib@2.7.0: {}
 
   type-fest@4.26.0: {}
 
-  typescript@5.6.2: {}
+  typescript@5.6.3: {}
 
   undici-types@6.19.8: {}
 
@@ -2747,11 +2748,11 @@ snapshots:
       - supports-color
       - terser
 
-  vite-tsconfig-paths@5.0.1(typescript@5.6.2)(vite@5.4.2(@types/node@22.4.1)(sugarss@4.0.1(postcss@8.4.41))):
+  vite-tsconfig-paths@5.0.1(typescript@5.6.3)(vite@5.4.2(@types/node@22.4.1)(sugarss@4.0.1(postcss@8.4.41))):
     dependencies:
       debug: 4.3.6
       globrex: 0.1.2
-      tsconfck: 3.1.3(typescript@5.6.2)
+      tsconfck: 3.1.3(typescript@5.6.3)
     optionalDependencies:
       vite: 5.4.2(@types/node@22.4.1)(sugarss@4.0.1(postcss@8.4.41))
     transitivePeerDependencies:
