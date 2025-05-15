@@ -13,7 +13,7 @@ import { entryAtomsForPlatformAtom } from "~/lib/entries";
 import MenuItem from "~/components/MenuItem";
 
 import PlatformItems from "./PlatformItems";
-import { menuStyles } from "./styles";
+import { menuStyles } from "~/styles";
 
 export default function MenuDropdown() {
 	const [{ clearAtom, saveToCSVAtom, loadFromCSVAtom }] = useAtom(
