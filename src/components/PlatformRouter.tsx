@@ -3,17 +3,33 @@ import { useAtom } from "jotai";
 
 import { platformAtom } from "~/lib/platformAtoms";
 import { spotifyTokenParam } from "~/../shared";
-
 import { Spotify } from "~/platforms/spotify";
 import { Youtube } from "~/platforms/youtube";
 import { AudioFile } from "~/platforms/audioFile";
 import Entries from "~/components/Entries";
+
 import Landing from "./Landing";
 
 export default function PlatformRouter() {
-	const { platform, token } = useSpotifyTokenForPlatform();
+	const [platform, setPlatform] = useAtom(platformAtom);
 
-	switch (platform) {
+	const token = new URLSearchParams(window.location.search).get(
+		spotifyTokenParam,
+	);
+
+	useEffect(() => {
+		if (!token) return;
+
+		setPlatform("spotify");
+
+		const newUrl = new URL(window.location.href);
+		newUrl.searchParams.delete(spotifyTokenParam);
+		window.history.replaceState(null, "", newUrl);
+	}, [token, setPlatform]);
+
+	const displayPlatform = token ? "spotify" : platform;
+
+	switch (displayPlatform) {
 		case "spotify":
 			return (
 				<Spotify token={token}>
@@ -36,23 +52,3 @@ export default function PlatformRouter() {
 			return <Landing />;
 	}
 }
-
-const useSpotifyTokenForPlatform = () => {
-	const [platform, setPlatform] = useAtom(platformAtom);
-
-	const token = new URLSearchParams(window.location.search).get(
-		spotifyTokenParam,
-	);
-
-	useEffect(() => {
-		if (!token) return;
-
-		setPlatform("spotify");
-
-		const newUrl = new URL(window.location.href);
-		newUrl.searchParams.delete(spotifyTokenParam);
-		window.history.replaceState(null, "", newUrl);
-	}, [token, setPlatform]);
-
-	return { platform: token ? "spotify" : platform, token };
-};

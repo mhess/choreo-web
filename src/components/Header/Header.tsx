@@ -1,11 +1,6 @@
 import { useAtom } from "jotai";
 import React, { useState } from "react";
-import {
-	MenuTrigger,
-	Tooltip,
-	TooltipTrigger,
-	Button,
-} from "react-aria-components";
+import { MenuTrigger, Button } from "react-aria-components";
 import { IconChevronDown, IconMoon, IconSun } from "@tabler/icons-react";
 import clsx from "clsx";
 
@@ -18,18 +13,14 @@ import {
 import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
 import { useIsMobile, useColorScheme } from "~/lib/utils";
+import Tooltip, { tooltipStyles } from "~/components/Tooltip";
 import TooltipWithClick from "~/components/TooltipWithClick";
 
 import SelectPlatformButton from "./SelectPlatformButton";
 import MenuDropdown from "./MenuDropdown";
 import Hamburger from "./Hamburger";
 
-import {
-	ctlBarStyles,
-	menuButtonStyles,
-	tooltipStyles,
-	withArrow,
-} from "~/styles";
+import { ctlBarStyles, menuButtonStyles } from "~/styles";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -136,7 +127,7 @@ const ToggleColorScheme = () => {
 	const { isDark, toggle } = useColorScheme();
 
 	return (
-		<TooltipTrigger delay={500}>
+		<Tooltip tooltip="Toggle light/dark mode">
 			<Button
 				className={`${menuButtonStyles} px-2 py-1`}
 				aria-label="Toggle light/dark mode"
@@ -144,9 +135,6 @@ const ToggleColorScheme = () => {
 			>
 				{React.createElement(isDark ? IconMoon : IconSun, { size: "1.25rem" })}
 			</Button>
-			<Tooltip className={tooltipStyles} offset={10}>
-				{withArrow("Toggle light/dark mode")}
-			</Tooltip>
-		</TooltipTrigger>
+		</Tooltip>
 	);
 };
