@@ -1,5 +1,4 @@
 import {
-	Button,
 	Dialog,
 	DialogTrigger,
 	Popover,
@@ -7,23 +6,22 @@ import {
 	TooltipTrigger,
 } from "react-aria-components";
 
-import { menuStyles } from "~/styles";
+import { tooltipStyles } from "~/styles";
 
 interface Props extends React.PropsWithChildren {
 	tooltip: React.ReactNode;
-	notPressable?: true;
 }
 
 const isTouchDevice = window.ontouchstart || navigator.maxTouchPoints > 0;
 
 export default function TooltipWithClick(props: Props) {
-	const { tooltip, children, notPressable } = props;
+	const { tooltip, children } = props;
 
 	return isTouchDevice ? (
 		<DialogTrigger>
-			{notPressable ? <Button>{children}</Button> : children}
+			{children}
 			<Popover offset={8}>
-				<Dialog className={`${menuStyles} max-w-xs`}>
+				<Dialog className={`${tooltipStyles} max-w-xs`}>
 					<p>{tooltip}</p>
 				</Dialog>
 			</Popover>
@@ -31,7 +29,7 @@ export default function TooltipWithClick(props: Props) {
 	) : (
 		<TooltipTrigger delay={0}>
 			{children}
-			<Tooltip className={`${menuStyles} max-w-xs`} offset={8}>
+			<Tooltip className={`${tooltipStyles} max-w-xs`} offset={8}>
 				{tooltip}
 			</Tooltip>
 		</TooltipTrigger>
