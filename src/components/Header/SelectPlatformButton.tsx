@@ -1,29 +1,29 @@
-import { Button, Group, Menu } from "@mantine/core";
 import { useAtom } from "jotai";
+import { Menu, MenuTrigger, Popover } from "react-aria-components";
 
 import { platformAtom } from "~/lib/platformAtoms";
+import Button from "~/components/Button";
 
 import PlatformItems, {
 	logoByPlatform,
 	labelByPlatform,
 } from "./PlatformItems";
+import { menuButtonStyles, menuStyles } from "./styles";
 
 export default function SelectPlatformButton() {
 	const [platform] = useAtom(platformAtom);
 
 	return (
-		<Menu trigger="hover">
-			<Menu.Target>
-				<Button variant="outline">
-					<Group gap="0.25rem">
-						{logoByPlatform[platform]}
-						{labelByPlatform[platform]}
-					</Group>
-				</Button>
-			</Menu.Target>
-			<Menu.Dropdown>
-				<PlatformItems />
-			</Menu.Dropdown>
-		</Menu>
+		<MenuTrigger>
+			<Button className={menuButtonStyles}>
+				{logoByPlatform[platform]}
+				{labelByPlatform[platform]}
+			</Button>
+			<Popover>
+				<Menu className={menuStyles}>
+					<PlatformItems />
+				</Menu>
+			</Popover>
+		</MenuTrigger>
 	);
 }

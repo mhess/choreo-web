@@ -10,8 +10,6 @@ import { createStore, Provider as JotaiProvider } from "jotai";
 import { DevTools } from "jotai-devtools";
 import "jotai-devtools/styles.css";
 
-import "@mantine/core/styles.css";
-
 import classes from "./App.module.css";
 
 import { BreakpointProvider } from "~/lib/utils";

@@ -1,46 +1,48 @@
-import { Menu } from "@mantine/core";
+import { Header, MenuItem, Section } from "react-aria-components";
 import { useAtom } from "jotai";
-import type { ReactNode } from "react";
 
 import { type Platform, platformAtom } from "~/lib/platformAtoms";
 
 import { AudioFile, Spotify, YouTube } from "../Logos";
+import { tw } from "~/lib/utils";
+
+const itemStyles = tw`mb-1 flex items-center gap-2 text-sm last:mb-0`;
 
 export default function PlatformItems() {
 	const [platform, setPlatform] = useAtom(platformAtom);
 
 	return (
-		<>
-			<Menu.Label>Switch to</Menu.Label>
+		<Section>
+			<Header className="mb-2 text-xs">Switch to</Header>
 			{platform !== "spotify" && (
-				<Menu.Item
-					leftSection={logoByPlatform.spotify}
-					onClick={() => setPlatform("spotify")}
+				<MenuItem
+					className={itemStyles}
+					onAction={() => setPlatform("spotify")}
 				>
-					{labelByPlatform.spotify}
-				</Menu.Item>
+					{logoByPlatform.spotify} {labelByPlatform.spotify}
+				</MenuItem>
 			)}
 			{platform !== "youtube" && (
-				<Menu.Item
-					leftSection={logoByPlatform.youtube}
-					onClick={() => setPlatform("youtube")}
+				<MenuItem
+					className={itemStyles}
+					onAction={() => setPlatform("youtube")}
 				>
-					{labelByPlatform.youtube}
-				</Menu.Item>
+					{logoByPlatform.youtube} {labelByPlatform.youtube}
+				</MenuItem>
 			)}
 			{platform !== "audioFile" && (
-				<Menu.Item
-					leftSection={logoByPlatform.audioFile}
-					onClick={() => setPlatform("audioFile")}
+				<MenuItem
+					className={itemStyles}
+					onAction={() => setPlatform("audioFile")}
 				>
-					{labelByPlatform.audioFile}
-				</Menu.Item>
+					{logoByPlatform.audioFile} {labelByPlatform.audioFile}
+				</MenuItem>
 			)}
-		</>
+		</Section>
 	);
 }
 
-export const logoByPlatform: Record<Platform, ReactNode> = {
+export const logoByPlatform: Record<Platform, React.ReactNode> = {
 	spotify: <Spotify />,
 	youtube: <YouTube />,
 	audioFile: <AudioFile />,

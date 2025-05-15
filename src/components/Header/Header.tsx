@@ -1,17 +1,14 @@
 import { useAtom } from "jotai";
-import React from "react";
+import React, { useState } from "react";
 import {
-	Box,
-	Burger,
-	Button,
 	Group,
-	Menu,
 	Text,
 	Tooltip,
 	useComputedColorScheme,
 	useMantineColorScheme,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { MenuTrigger } from "react-aria-components";
+
 import { IconChevronDown, IconMoon, IconSun } from "@tabler/icons-react";
 
 import {
@@ -27,8 +24,11 @@ import { useIsMobile } from "~/lib/utils";
 import TooltipWithClick from "~/components/TooltipWithClick";
 import SelectPlatformButton from "./SelectPlatformButton";
 import MenuDropdown from "./MenuDropdown";
+import Hamburger from "./Hamburger";
+import Button from "~/components/Button";
 
 import classes from "./Header.module.css";
+import { menuButtonStyles } from "./styles";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -44,18 +44,16 @@ export default function Header() {
 		(platform === "youtube" && !!ytVideoId);
 
 	return (
-		<Group component="header" className={classes.header}>
-			<Group className={classes.headerLeftSide}>
-				<Text
-					role="button"
-					onClick={() => setPlatform("landing")}
-					className={classes.logo}
-					span
+		<header className="flex items-center border-b border-slate-800 bg-emerald-50 px-4 py-1 dark:border-slate-500 dark:bg-teal-900">
+			<div className="flex min-w-0 flex-nowrap gap-4">
+				<Button
+					onPress={() => setPlatform("landing")}
+					className="p-2 text-lg font-bold uppercase text-violet-900 dark:text-purple-300"
 				>
 					Choreo
-				</Text>
+				</Button>
 				{player && <TrackInfo />}
-			</Group>
+			</div>
 			<Group
 				className={classes.headerRightSide}
 				justify={isSpotify && player ? "space-between" : "right"}
@@ -64,20 +62,13 @@ export default function Header() {
 					<>
 						{isSpotify && <SpotifyChangeButton />}
 						{!isMobile && (
-							<Box>
-								<Menu trigger="hover">
-									<Menu.Target>
-										<Button variant="outline" className={classes.actions}>
-											Actions
-											<IconChevronDown
-												size="1.25rem"
-												style={{ transform: "translateY(0.125rem)" }}
-											/>
-										</Button>
-									</Menu.Target>
-									<MenuDropdown />
-								</Menu>
-							</Box>
+							<MenuTrigger>
+								<Button className={`${menuButtonStyles} font-bold`}>
+									Actions
+									<IconChevronDown size="1.25rem" className="translate-y-0.5" />
+								</Button>
+								<MenuDropdown />
+							</MenuTrigger>
 						)}
 					</>
 				)}
@@ -87,7 +78,7 @@ export default function Header() {
 				{!isMobile && <ToggleColorScheme />}
 				{isMobile && <BurgerMenu />}
 			</Group>
-		</Group>
+		</header>
 	);
 }
 
@@ -120,7 +111,9 @@ const SpotifyChangeButton = () => {
 			multiline
 			label="Use a Spotify desktop or mobile app to change the track."
 		>
-			<Button variant="outline" className={classes.changeTrack}>
+			<Button
+				className={`${menuButtonStyles} relative -top-1 mx-2 h-4 px-2 text-[0.625rem]`}
+			>
 				Change?
 			</Button>
 		</TooltipWithClick>
@@ -128,15 +121,17 @@ const SpotifyChangeButton = () => {
 };
 
 const BurgerMenu = () => {
-	const [opened, { toggle, close }] = useDisclosure(false);
+	const [isOpened, setIsOpened] = useState(false);
 
 	return (
-		<Menu onClose={close}>
-			<Menu.Target>
-				<Burger opened={opened} aria-label="Toggle menu" onClick={toggle} />
-			</Menu.Target>
+		<MenuTrigger onOpenChange={setIsOpened}>
+			<Hamburger
+				onHoverChange={(state) => console.log({ state })}
+				opened={isOpened}
+				aria-label="Toggle menu"
+			/>
 			<MenuDropdown />
-		</Menu>
+		</MenuTrigger>
 	);
 };
 
@@ -147,9 +142,9 @@ const ToggleColorScheme = () => {
 	return (
 		<Tooltip label="Toggle light/dark mode" w={173}>
 			<Button
+				className={menuButtonStyles}
 				aria-label="Toggle light/dark mode"
-				variant="outline"
-				onClick={toggleColorScheme}
+				onPress={toggleColorScheme}
 			>
 				{React.createElement(isLight ? IconSun : IconMoon, { size: "1.25rem" })}
 			</Button>
