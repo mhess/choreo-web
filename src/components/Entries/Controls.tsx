@@ -76,10 +76,10 @@ const TrackTime = () => {
 	}, [player]);
 
 	return (
-		<TooltipWithClick tooltip="Current track time">
-			<span className="flex h-6 w-[5.5rem] items-center justify-end rounded bg-zinc-50 px-2 font-mono text-sm dark:bg-zinc-800">
+		<TooltipWithClick notPressable tooltip="Current track time">
+			<Button className="flex h-6 w-[5.5rem] cursor-default items-center justify-end rounded bg-zinc-50 px-2 font-mono text-sm dark:bg-zinc-800">
 				{displayMs(timeMs)}
-			</span>
+			</Button>
 		</TooltipWithClick>
 	);
 };

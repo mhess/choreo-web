@@ -23,11 +23,11 @@ export default forwardRef(function Hamburger(
 			className="grid w-6 justify-items-center gap-1 px-1 py-2"
 		>
 			<span
-				className={clsx(lineStyles, opened ? "rotate-45" : "translate-y-1.5")}
+				className={clsx(lineStyles, opened && "translate-y-1.5 rotate-45")}
 			/>
 			<span className={clsx(lineStyles, opened && "scale-x-0 transition")} />
 			<span
-				className={clsx(lineStyles, opened ? "-rotate-45" : "-translate-y-1.5")}
+				className={clsx(lineStyles, opened && "-translate-y-1.5 -rotate-45")}
 			/>
 		</Button>
 	);

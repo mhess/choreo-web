@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { tw } from "./lib/utils";
 
-export const menuStyles = tw`rounded border border-solid border-slate-400 bg-slate-100 px-2 py-1 outline-none dark:border-slate-500 dark:bg-slate-700`;
+export const menuStyles = tw`rounded border border-solid border-slate-400 bg-slate-100 p-2 outline-none dark:border-slate-500 dark:bg-slate-700`;
 
 export const ctlBarBgStyles = tw`bg-green-100 dark:bg-teal-900`;
 

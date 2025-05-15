@@ -6,18 +6,19 @@ import { tw, useIsMobile } from "~/lib/utils";
 const desktopControlsHelp = (
 	<>
 		From left to right, the control bar below has the <b>current track time</b>,{" "}
-		<b>playback buttons</b>, and the <b>Add Entry</b> button.
+		<b>playback</b> buttons, and the <b>Add&nbsp;Entry</b> button.
 	</>
 );
 
 const mobileControlsHelp = (
 	<>
 		From left-to-right and top-to-bottom, the control bar below has the{" "}
-		<b>current track time</b>, <b>Add Entry</b>, and <b>playback</b> buttons.
+		<b>current track time</b>, <b>Add&nbsp;Entry</b>, and <b>playback</b>{" "}
+		buttons.
 	</>
 );
 
-const helpSectionStyles = tw`max-w-7xl justify-center bg-amber-300 px-4 py-2 text-sm dark:bg-orange-400`;
+const helpSectionStyles = tw`max-w-7xl justify-center bg-amber-300 px-6 py-2 text-sm dark:bg-amber-500/40`;
 const termStyles = tw`font-bold italic`;
 const defStyles = tw`ml-4`;
 
@@ -91,8 +92,8 @@ export default function Help(props: HelpProps) {
 						{isMobile ? mobileControlsHelp : desktopControlsHelp}
 					</p>
 					<p>
-						The <b>Add Entry</b>{" "}
-						<IconPlaylistAdd width="1.25rem" className="inline" /> button will
+						The <b>Add&nbsp;Entry</b>{" "}
+						<IconPlaylistAdd width="1.5rem" className="inline" /> button will
 						add an entry at the current track time—even while the track is
 						playing.
 					</p>

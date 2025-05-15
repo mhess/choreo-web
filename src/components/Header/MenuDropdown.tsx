@@ -104,7 +104,7 @@ export default function MenuDropdown() {
 				output.push(
 					<Separator
 						key={`div-${index}`}
-						className="my-1 border-t border-slate-300 dark:border-slate-400"
+						className="my-2 border-t border-slate-300 dark:border-slate-400"
 					/>,
 				);
 			return output;

@@ -10,9 +10,9 @@ export default function Spotify({
 
 	if (status === SpotifyPlayerStatus.LOGGED_OUT)
 		return (
-			<div className="flex w-full justify-center">
+			<div className="flex h-full flex-col items-center justify-center">
 				<p>
-					Please <a href="/api/login">log&nbsp;in</a> to your spotify premium
+					Please <a href="/api/login">log&nbsp;in</a> to your Spotify premium
 					account.
 				</p>
 			</div>
@@ -21,7 +21,9 @@ export default function Spotify({
 	return status === SpotifyPlayerStatus.READY ? (
 		children
 	) : (
-		<div className="mx-4 h-full">{messageByStatus[status]}</div>
+		<div className="mx-4 flex h-full flex-col justify-center">
+			{messageByStatus[status]}
+		</div>
 	);
 }
 
@@ -38,7 +40,7 @@ const messageByStatus: Record<
 > = {
 	[SpotifyPlayerStatus.LOADING]: <Loading message="Connecting to Spotify" />,
 	[SpotifyPlayerStatus.NOT_CONNECTED]: (
-		<div className="flex flex-col items-center">
+		<div className="flex flex-col gap-4 text-center">
 			<p>
 				Please connect to the &ldquo;Choreo Player&rdquo; device in the Spotify
 				player.

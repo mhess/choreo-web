@@ -24,6 +24,7 @@ import MenuDropdown from "./MenuDropdown";
 import Hamburger from "./Hamburger";
 
 import { ctlBarStyles, menuButtonStyles, menuStyles } from "~/styles";
+import clsx from "clsx";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -50,7 +51,10 @@ export default function Header() {
 				{player && <TrackInfo />}
 			</div>
 			<div
-				className={`mr-4 flex grow flex-nowrap ${isSpotify && player ? "justify-between" : "justify-end"}`}
+				className={clsx(
+					"mr-4 flex grow flex-nowrap",
+					isSpotify && player ? "justify-between" : "justify-end",
+				)}
 			>
 				{shouldShowActions && (
 					<>
@@ -98,9 +102,12 @@ const SpotifyChangeButton = () => {
 	const [player] = useAtom(playerAtom);
 
 	return !player ? null : (
-		<TooltipWithClick tooltip="Use a Spotify desktop or mobile app to change the track.">
+		<TooltipWithClick tooltip="Use the Spotify desktop or mobile app to change the track.">
 			<Button
-				className={`${menuButtonStyles} relative -top-1 mx-2 h-4 px-1 text-[0.5rem] font-bold`}
+				className={clsx(
+					menuButtonStyles,
+					"relative -top-1 mx-2 h-4 px-1 text-[0.5rem] font-bold",
+				)}
 			>
 				Change?
 			</Button>
