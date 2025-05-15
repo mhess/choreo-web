@@ -23,7 +23,7 @@ export default function Tooltip(props: Props) {
 	const styles = className ? className : tw`${tooltipStyles} max-w-xs`;
 
 	return (
-		<TooltipTrigger delay={0} {...triggerProps}>
+		<TooltipTrigger delay={0} closeDelay={250} {...triggerProps}>
 			{children}
 			<AriaTooltip className={styles} offset={offset ?? tooltipOffset}>
 				{withArrow(tooltip)}

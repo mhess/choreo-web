@@ -6,9 +6,10 @@
 		<meta name="description" content="Easily compose choreography to music" />
 		<title>Choreo</title>
 		<script>
+			window.darkClassName = "dark";
 			document.documentElement.classList.toggle(
-				"dark",
-				localStorage.theme === "dark" ||
+				darkClassName,
+				localStorage.theme === darkClassName ||
 					(!("theme" in localStorage) &&
 						window.matchMedia("(prefers-color-scheme: dark)").matches),
 			);
