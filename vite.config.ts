@@ -1,10 +1,11 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
+import tailwindcss from '@tailwindcss/vite';
+import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-	plugins: [react(), tsconfigPaths()],
+	plugins: [react(), tailwindcss(), tsConfigPaths()],
 	test: {
 		environment: "jsdom",
 		setupFiles: ["./src/test/vitest-setup.ts"],
