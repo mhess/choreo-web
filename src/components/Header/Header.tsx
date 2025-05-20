@@ -1,26 +1,25 @@
-import { useAtom } from "jotai";
-import React, { useState } from "react";
-import { MenuTrigger, Button } from "react-aria-components";
 import { IconChevronDown, IconMoon, IconSun } from "@tabler/icons-react";
 import clsx from "clsx";
+import { useAtom } from "jotai";
+import React, { useState } from "react";
+import { Button, MenuTrigger } from "react-aria-components";
 
+import Tooltip, { tooltipStyles } from "~/components/Tooltip";
+import TooltipWithClick from "~/components/TooltipWithClick";
 import {
 	artistAtom,
 	platformAtom,
 	playerAtom,
 	trackNameAtom,
 } from "~/lib/platformAtoms";
+import { useColorScheme, useIsMobile } from "~/lib/utils";
 import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
-import { useIsMobile, useColorScheme } from "~/lib/utils";
-import Tooltip, { tooltipStyles } from "~/components/Tooltip";
-import TooltipWithClick from "~/components/TooltipWithClick";
-
-import SelectPlatformButton from "./SelectPlatformButton";
-import MenuDropdown from "./MenuDropdown";
-import Hamburger from "./Hamburger";
-
 import { ctlBarStyles, menuButtonStyles } from "~/styles";
+
+import Hamburger from "./Hamburger";
+import MenuDropdown from "./MenuDropdown";
+import SelectPlatformButton from "./SelectPlatformButton";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
@@ -40,7 +39,7 @@ export default function Header() {
 			<div className="flex min-w-0 flex-nowrap items-center gap-4">
 				<Button
 					onPress={() => setPlatform("landing")}
-					className="p-2 text-lg font-bold uppercase text-violet-700 dark:text-violet-500 dark:brightness-200"
+					className="p-2 text-lg font-bold text-violet-700 uppercase dark:text-violet-500 dark:brightness-200"
 				>
 					Choreo
 				</Button>

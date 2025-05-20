@@ -1,18 +1,18 @@
-import { useRef, createElement, Fragment, type ReactElement } from "react";
-import { Menu, Popover, Separator } from "react-aria-components";
-import { useAtom } from "jotai";
 import { IconMoon, IconSun } from "@tabler/icons-react";
+import { useAtom } from "jotai";
+import { Fragment, type ReactElement, createElement, useRef } from "react";
+import { Menu, Popover, Separator } from "react-aria-components";
 
-import { useIsMobile, useColorScheme } from "~/lib/utils";
+import MenuItem from "~/components/MenuItem";
+import { entryAtomsForPlatformAtom } from "~/lib/entries";
 import { platformAtom, playerAtom, trackNameAtom } from "~/lib/platformAtoms";
+import { useColorScheme, useIsMobile } from "~/lib/utils";
+import { audioFileAtom } from "~/platforms/audioFile";
 import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
-import { audioFileAtom } from "~/platforms/audioFile";
-import { entryAtomsForPlatformAtom } from "~/lib/entries";
-import MenuItem from "~/components/MenuItem";
+import { menuStyles } from "~/styles";
 
 import PlatformItems from "./PlatformItems";
-import { menuStyles } from "~/styles";
 
 export default function MenuDropdown() {
 	const [{ clearAtom, saveToCSVAtom, loadFromCSVAtom }] = useAtom(

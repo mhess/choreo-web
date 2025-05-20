@@ -1,5 +1,6 @@
-import { spotifyTokenParam } from "../shared";
 import { Buffer } from "node:buffer";
+
+import { spotifyTokenParam } from "../shared";
 
 export const config = { runtime: "edge" };
 

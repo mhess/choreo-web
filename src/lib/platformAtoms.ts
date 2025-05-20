@@ -1,8 +1,8 @@
 import { atom, useAtom } from "jotai";
 
+import { atoms as audioFile } from "~/platforms/audioFile";
 import { atoms as spotify } from "~/platforms/spotify";
 import { atoms as youtube } from "~/platforms/youtube";
-import { atoms as audioFile } from "~/platforms/audioFile";
 
 import type { PlatformAtoms, PlatformPlayer } from "./player";
 

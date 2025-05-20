@@ -1,21 +1,21 @@
+import { render, screen } from "@testing-library/react";
+import userEvent, { type UserEvent } from "@testing-library/user-event";
 import {
+	type Mock,
 	afterEach,
 	beforeEach,
 	describe,
 	expect,
 	it,
 	vi,
-	type Mock,
 } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent, { type UserEvent } from "@testing-library/user-event";
 
 import { spotifyTokenParam } from "~/../shared";
-import { withStore, type Store } from "~/test/utils";
-import type { PlatformPlayer } from "~/lib/player";
-import { spotifyTokenAtom } from "~/platforms/spotify";
 import type { AtomicEntry } from "~/lib/entries";
 import { platformAtom } from "~/lib/platformAtoms";
+import type { PlatformPlayer } from "~/lib/player";
+import { spotifyTokenAtom } from "~/platforms/spotify";
+import { type Store, withStore } from "~/test/utils";
 
 import Header from "./Header";
 

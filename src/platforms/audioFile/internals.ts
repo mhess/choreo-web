@@ -1,7 +1,7 @@
-import { atom, useAtom, type PrimitiveAtom } from "jotai";
+import { type PrimitiveAtom, atom, useAtom } from "jotai";
 import { useEffect, useRef } from "react";
 
-import { getPlatformAtoms, PlatformPlayer } from "~/lib/player";
+import { PlatformPlayer, getPlatformAtoms } from "~/lib/player";
 
 export enum FilePlayerStatus {
 	NO_FILE = "No file provided",

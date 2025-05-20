@@ -1,13 +1,13 @@
-import { type WritableAtom, createStore, Provider } from "jotai";
+import { Provider, type WritableAtom, createStore } from "jotai";
 import type { PropsWithChildren } from "react";
 import { beforeEach, expect } from "vitest";
 
+import { entryAtomsForPlatformAtom } from "~/lib/entries";
 import {
 	type Platform,
 	atomsForPlatformAtom,
 	platformAtom,
 } from "~/lib/platformAtoms";
-import { entryAtomsForPlatformAtom } from "~/lib/entries";
 import { IsMobileContext } from "~/lib/utils";
 
 // See https://github.com/pmndrs/jotai/discussions/2650 for more info on the typing here

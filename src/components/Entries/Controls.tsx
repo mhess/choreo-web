@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-import { useAtom } from "jotai";
 import {
 	IconPlayerPause,
 	IconPlayerPlay,
@@ -7,16 +5,17 @@ import {
 	IconRewindBackward5,
 	IconRewindForward5,
 } from "@tabler/icons-react";
-import { Button } from "react-aria-components";
 import clsx from "clsx";
-
-import type { OnTickCallback } from "~/lib/player";
-import { displayMs, tw, useIsMobile } from "~/lib/utils";
-import { playerPausedAtom, useEstablishedPlayer } from "~/lib/platformAtoms";
-import { entryAtomsForPlatformAtom } from "~/lib/entries";
-import { ctlBarStyles } from "~/styles";
+import { useAtom } from "jotai";
+import React, { useEffect, useState } from "react";
+import { Button } from "react-aria-components";
 
 import TooltipWithClick from "~/components/TooltipWithClick";
+import { entryAtomsForPlatformAtom } from "~/lib/entries";
+import { playerPausedAtom, useEstablishedPlayer } from "~/lib/platformAtoms";
+import type { OnTickCallback } from "~/lib/player";
+import { displayMs, tw, useIsMobile } from "~/lib/utils";
+import { ctlBarStyles } from "~/styles";
 
 import HelpButton from "./HelpButton";
 

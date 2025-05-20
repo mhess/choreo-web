@@ -1,4 +1,6 @@
+import { act, render, screen, within } from "@testing-library/react";
 import {
+	type Mock,
 	afterEach,
 	beforeEach,
 	describe,
@@ -6,17 +8,15 @@ import {
 	it,
 	test,
 	vi,
-	type Mock,
 } from "vitest";
-import { act, render, screen, within } from "@testing-library/react";
 
-import { withStore, expectNoDomChange, expectOnly } from "~/test/utils";
-import { FakeSpotifyPlayer } from "./fakePlayer";
-import { PlatformPlayer } from "~/lib/player";
-import { spotifyTokenAtom } from "./internals";
 import { spotifyTokenParam } from "~/../shared";
+import { PlatformPlayer } from "~/lib/player";
+import { expectNoDomChange, expectOnly, withStore } from "~/test/utils";
 
 import SpotifyComponent from "./Spotify";
+import { FakeSpotifyPlayer } from "./fakePlayer";
+import { spotifyTokenAtom } from "./internals";
 
 const assertScriptAndInvokeCallback = () => {
 	const scripts = document.body.getElementsByTagName("script");

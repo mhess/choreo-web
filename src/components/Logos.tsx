@@ -1,5 +1,5 @@
-import type { SVGProps } from "react";
 import { IconFileMusic } from "@tabler/icons-react";
+import type { SVGProps } from "react";
 
 import { tw } from "~/lib/utils";
 

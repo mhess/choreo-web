@@ -1,16 +1,16 @@
-import {
-	describe,
-	it,
-	expect,
-	vi,
-	beforeEach,
-	type Mock,
-	afterEach,
-} from "vitest";
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
 import { useAtom } from "jotai";
+import {
+	type Mock,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from "vitest";
 
 import type { AtomicEntry, EntryInput } from "~/lib/entries";
 import type { PlatformPlayer } from "~/lib/player";

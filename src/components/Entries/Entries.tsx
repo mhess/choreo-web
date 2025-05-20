@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import { useAtom } from "jotai";
 import clsx from "clsx";
+import { useAtom } from "jotai";
+import { useEffect, useRef, useState } from "react";
 
-import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { setOnIndexChangeAtom, useEntryAtoms } from "~/lib/entries";
+import { useEstablishedPlayer } from "~/lib/platformAtoms";
+import { tw } from "~/lib/utils";
 
-import { COUNT_LABEL, countWidth, NOTE_LABEL } from "./shared";
-import Help from "./Help";
 import Controls from "./Controls";
 import Entry from "./Entry";
-import { tw } from "~/lib/utils";
+import Help from "./Help";
+import { COUNT_LABEL, NOTE_LABEL, countWidth } from "./shared";
 
 export default function Entries() {
 	const player = useEstablishedPlayer();
@@ -65,7 +65,7 @@ export default function Entries() {
 	);
 }
 
-const textStyles = tw`text-sm font-bold leading-3`;
+const textStyles = tw`text-sm leading-3 font-bold`;
 const borderStyles = tw`border-r border-solid border-gray-800 dark:border-gray-500`;
 
 const countStyles = clsx(

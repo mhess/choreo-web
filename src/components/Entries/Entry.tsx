@@ -1,18 +1,18 @@
+import { IconArrowMoveDown, IconX } from "@tabler/icons-react";
 import { useAtom } from "jotai";
 import {
+	Button,
 	Dialog,
 	DialogTrigger,
 	Heading,
 	Modal,
-	Button,
 } from "react-aria-components";
-import { IconArrowMoveDown, IconX } from "@tabler/icons-react";
 
-import { displayMs } from "~/lib/utils";
-import { useEstablishedPlayer } from "~/lib/platformAtoms";
-import { entryAtomsForPlatformAtom, type AtomicEntry } from "~/lib/entries";
 import InputWithAtom from "~/components/TextInputWithAtom";
 import Tooltip, { tooltipStyles } from "~/components/Tooltip";
+import { type AtomicEntry, entryAtomsForPlatformAtom } from "~/lib/entries";
+import { useEstablishedPlayer } from "~/lib/platformAtoms";
+import { displayMs } from "~/lib/utils";
 import { actionBtnStyles } from "~/styles";
 
 import { COUNT_LABEL, NOTE_LABEL } from "./shared";
@@ -39,7 +39,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 	return (
 		<div
 			role="row"
-			className={`flex items-center pl-4 pr-2 ${isCurrent ? "bg-orange-300 dark:bg-yellow-700" : "bg-zinc-300 odd:bg-zinc-400 dark:bg-zinc-800 dark:odd:bg-zinc-900"}`}
+			className={`flex items-center pr-2 pl-4 ${isCurrent ? "bg-orange-300 dark:bg-yellow-700" : "bg-zinc-300 odd:bg-zinc-400 dark:bg-zinc-800 dark:odd:bg-zinc-900"}`}
 		>
 			<div>
 				{canFill ? (

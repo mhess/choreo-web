@@ -1,4 +1,5 @@
 import clsx from "clsx";
+
 import { tw } from "./lib/utils";
 
 export const menuStyles = tw`rounded border border-solid border-slate-400 bg-slate-100 p-2 outline-none dark:border-slate-500 dark:bg-slate-700`;

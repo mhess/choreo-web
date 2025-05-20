@@ -1,9 +1,9 @@
-import Papa from "papaparse";
 import { atom, useAtom } from "jotai";
 import type { Atom, Getter, PrimitiveAtom, Setter, WritableAtom } from "jotai";
+import Papa from "papaparse";
 import { useLayoutEffect } from "react";
 
-import { platformAtom, platforms, type Platform } from "~/lib/platformAtoms";
+import { type Platform, platformAtom, platforms } from "~/lib/platformAtoms";
 
 export type Entry = {
 	count: number;

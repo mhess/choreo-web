@@ -1,10 +1,10 @@
-import { createStore, Provider as JotaiProvider } from "jotai";
+import { Provider as JotaiProvider, createStore } from "jotai";
 import { DevTools } from "jotai-devtools";
 import "jotai-devtools/styles.css";
 
-import { BreakpointProvider } from "~/lib/utils";
-import PlatformRouter from "~/components/PlatformRouter";
 import Header from "~/components/Header";
+import PlatformRouter from "~/components/PlatformRouter";
+import { BreakpointProvider } from "~/lib/utils";
 
 const store = createStore();
 

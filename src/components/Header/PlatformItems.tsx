@@ -1,8 +1,8 @@
-import { Header, Section } from "react-aria-components";
 import { useAtom } from "jotai";
+import { Header, Section } from "react-aria-components";
 
-import { type Platform, platformAtom } from "~/lib/platformAtoms";
 import MenuItem from "~/components/MenuItem";
+import { type Platform, platformAtom } from "~/lib/platformAtoms";
 import { tw } from "~/lib/utils";
 
 import { AudioFile, Spotify, YouTube } from "../Logos";

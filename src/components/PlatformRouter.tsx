@@ -1,12 +1,12 @@
-import { useEffect } from "react";
 import { useAtom } from "jotai";
+import { useEffect } from "react";
 
-import { platformAtom } from "~/lib/platformAtoms";
 import { spotifyTokenParam } from "~/../shared";
+import Entries from "~/components/Entries";
+import { platformAtom } from "~/lib/platformAtoms";
+import { AudioFile } from "~/platforms/audioFile";
 import { Spotify } from "~/platforms/spotify";
 import { Youtube } from "~/platforms/youtube";
-import { AudioFile } from "~/platforms/audioFile";
-import Entries from "~/components/Entries";
 
 import Landing from "./Landing";
 

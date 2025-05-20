@@ -1,8 +1,9 @@
-import { useAtom, type WritableAtom } from "jotai";
+import { type WritableAtom, useAtom } from "jotai";
 
-interface Props<T> extends Omit<React.ComponentPropsWithRef<'input'>, 'onChange'> {
-	atom: WritableAtom<T, [T], void>
-};
+interface Props<T>
+	extends Omit<React.ComponentPropsWithRef<"input">, "onChange"> {
+	atom: WritableAtom<T, [T], void>;
+}
 
 export default function InputWithAtom<T extends string | number>(
 	props: Props<T>,

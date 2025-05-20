@@ -1,11 +1,11 @@
-import { useEffect } from "react";
-import { atom, useAtom, type PrimitiveAtom } from "jotai";
+import { type PrimitiveAtom, atom, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { useEffect } from "react";
 
 import { spotifyTokenParam } from "~/../shared";
+import { PlatformPlayer, getPlatformAtoms } from "~/lib/player";
 
 import { FakeSpotifyPlayer } from "./fakePlayer";
-import { PlatformPlayer, getPlatformAtoms } from "~/lib/player";
 
 declare global {
 	interface Window {

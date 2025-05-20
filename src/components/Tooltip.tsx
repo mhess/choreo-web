@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import {
 	Tooltip as AriaTooltip,
+	OverlayArrow,
 	TooltipTrigger,
 	TooltipTriggerComponentProps,
-	OverlayArrow,
 } from "react-aria-components";
 
 import { tw } from "~/lib/utils";

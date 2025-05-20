@@ -1,14 +1,14 @@
+import clsx from "clsx";
 import { type PropsWithChildren, useState } from "react";
 import { Button } from "react-aria-components";
-import clsx from "clsx";
 
-import { actionBtnStyles } from "~/styles";
 import Loading from "~/components/Loading";
+import { actionBtnStyles } from "~/styles";
 
 import {
+	YouTubePlayerStatus,
 	extractVideoIdFromUrl,
 	useYouTubePlayer,
-	YouTubePlayerStatus,
 } from "./internals";
 
 export default function YouTubeEditor({ children }: PropsWithChildren) {
@@ -61,7 +61,7 @@ const UrlForm = ({ setVideoId }: { setVideoId: (id: string) => void }) => {
 
 	return (
 		<div className="flex w-full justify-center overflow-hidden">
-			<div className="mx-4 mb-4 mt-8 flex max-w-sm flex-1 flex-col items-center gap-4">
+			<div className="mx-4 mt-8 mb-4 flex max-w-sm flex-1 flex-col items-center gap-4">
 				<p>Please enter or paste in a YouTube video URL or ID</p>
 				<div className="flex w-full flex-col gap-2">
 					<input

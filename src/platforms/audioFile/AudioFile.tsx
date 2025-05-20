@@ -1,15 +1,15 @@
 import {
-	useRef,
-	type MutableRefObject,
 	type ChangeEvent,
+	type MutableRefObject,
 	type PropsWithChildren,
+	useRef,
 } from "react";
 import { Button } from "react-aria-components";
 
 import Loading from "~/components/Loading";
+import { actionBtnStyles } from "~/styles";
 
 import { FilePlayerStatus, useAudioFilePlayer } from "./internals";
-import { actionBtnStyles } from "~/styles";
 
 export default function AudioFileEditor({ children }: PropsWithChildren) {
 	const { status, setFile } = useAudioFilePlayer();

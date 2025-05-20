@@ -1,6 +1,6 @@
+import clsx from "clsx";
 import { useAtom } from "jotai";
 import { Button } from "react-aria-components";
-import clsx from "clsx";
 
 import { platformAtom } from "~/lib/platformAtoms";
 import { tw, useIsMobile } from "~/lib/utils";
@@ -8,10 +8,7 @@ import { ctlBarBgStyles } from "~/styles";
 
 import { AudioFile, Spotify, YouTube } from "./Logos";
 
-const btnStyles = clsx(
-	ctlBarBgStyles,
-	tw`flex items-center rounded border border-zinc-400 px-4 py-1 hover:brightness-95 dark:border-zinc-600 dark:hover:brightness-110`,
-);
+const btnStyles = tw`${ctlBarBgStyles} flex items-center rounded border border-zinc-400 px-4 py-1 hover:brightness-95 dark:border-zinc-600 dark:hover:brightness-110`;
 
 export default function Landing() {
 	const isMobile = useIsMobile();
@@ -19,7 +16,10 @@ export default function Landing() {
 
 	return (
 		<div
-			className={`flex w-full justify-center overflow-y-auto ${isMobile ? "items-start pt-4" : ""}`}
+			className={clsx(
+				"flex w-full justify-center overflow-y-auto",
+				isMobile && "items-start pt-4",
+			)}
 		>
 			<div className="m-4 mt-8 flex w-full max-w-3xl flex-col gap-4 text-center">
 				<h3 className="text-4xl font-bold">Welcome to the Choreo&nbsp;App!</h3>

@@ -1,7 +1,8 @@
 import { Dialog, DialogTrigger, Popover } from "react-aria-components";
+
 import { tw } from "~/lib/utils";
 
-import Tooltip, { withArrow, tooltipStyles, tooltipOffset } from "./Tooltip";
+import Tooltip, { tooltipOffset, tooltipStyles, withArrow } from "./Tooltip";
 
 const isTouchDevice = window.ontouchstart || navigator.maxTouchPoints > 0;
 
