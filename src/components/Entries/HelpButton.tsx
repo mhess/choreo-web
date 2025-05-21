@@ -6,7 +6,7 @@ import { Button, Dialog, Heading } from "react-aria-components";
 import { createPortal } from "react-dom";
 
 import { useIsMobile } from "~/lib/utils";
-import { actionBtnStyles, menuButtonStyles } from "~/styles";
+import { actionBtnStyles, menuBtnStyles } from "~/styles";
 
 interface HelpState {
 	isShowing: boolean;
@@ -115,7 +115,7 @@ function TriggerButton(props: TriggerButtonProps) {
 		<Button
 			ref={btnRef}
 			className={clsx(
-				menuButtonStyles,
+				menuBtnStyles,
 				"px-2 py-1 text-sm",
 				dialogBtnStyles &&
 					"fixed shadow-[0_0_10px_1px] shadow-white data-[focus-visible]:outline-orange-500",

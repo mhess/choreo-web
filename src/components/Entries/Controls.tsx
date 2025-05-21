@@ -19,7 +19,7 @@ import { ctlBarStyles } from "~/styles";
 
 import HelpButton from "./HelpButton";
 
-const ctlBtnStyles = tw`rounded border border-zinc-600 bg-slate-50 hover:brightness-[98%] dark:bg-slate-800 dark:hover:brightness-110`;
+const ctlBtnStyles = tw`cursor-pointer rounded border border-zinc-600 bg-slate-50 hover:brightness-[98%] dark:bg-slate-800 dark:hover:brightness-110`;
 
 interface Props {
 	help: { isShowing: boolean; toggle: () => void };

@@ -1,4 +1,5 @@
 import { IconArrowMoveDown, IconX } from "@tabler/icons-react";
+import { clsx } from "clsx";
 import { useAtom } from "jotai";
 import {
 	Button,
@@ -82,7 +83,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 													Yes
 												</Button>
 												<Button
-													className="rounded border border-zinc-600 px-4 py-2 hover:backdrop-brightness-95 dark:hover:backdrop-brightness-110"
+													className="cursor-pointer rounded border border-zinc-600 px-4 py-2 hover:backdrop-brightness-95 dark:hover:backdrop-brightness-110"
 													onPress={close}
 												>
 													No
@@ -104,7 +105,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 			</div>
 			<Button
 				aria-label={`Seek to ${displayTime}`}
-				className="w-[5.5rem] px-4 py-2 text-right hover:text-blue-400"
+				className="w-[5.5rem] cursor-pointer px-4 py-2 text-right hover:text-blue-400"
 				onPress={() => player.seekTo(timeMs)}
 			>
 				{displayTime}
@@ -115,7 +116,10 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 				atom={noteAtom}
 			/>
 			<Button
-				className="rounded p-1 backdrop-brightness-95 hover:backdrop-brightness-90 disabled:opacity-0 dark:backdrop-brightness-110 hover:dark:backdrop-brightness-125"
+				className={clsx(
+					"p-hover:backdrop-brightness-90 rounded p-1 backdrop-brightness-95 disabled:opacity-0 dark:backdrop-brightness-110 hover:dark:backdrop-brightness-125",
+					index > 0 && "cursor-pointer",
+				)}
 				aria-label="Delete Entry"
 				isDisabled={!index}
 				onPress={() => removeEntry(index)}

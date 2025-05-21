@@ -15,7 +15,7 @@ import {
 import { useColorScheme, useIsMobile } from "~/lib/utils";
 import { spotifyAuthAtom } from "~/platforms/spotify";
 import { videoIdAtom } from "~/platforms/youtube";
-import { ctlBarStyles, menuButtonStyles } from "~/styles";
+import { ctlBarStyles, menuBtnStyles } from "~/styles";
 
 import Hamburger from "./Hamburger";
 import MenuDropdown from "./MenuDropdown";
@@ -39,7 +39,7 @@ export default function Header() {
 			<div className="flex min-w-0 flex-nowrap items-center gap-4">
 				<Button
 					onPress={() => setPlatform("landing")}
-					className="p-2 text-lg font-bold text-violet-700 uppercase dark:text-violet-500 dark:brightness-200"
+					className="cursor-pointer p-2 text-lg font-bold text-violet-700 uppercase dark:text-violet-500 dark:brightness-200"
 				>
 					Choreo
 				</Button>
@@ -56,7 +56,7 @@ export default function Header() {
 						{isSpotify && <SpotifyChangeButton />}
 						{!isMobile && (
 							<MenuTrigger>
-								<Button className={`${menuButtonStyles} px-2 py-1 text-sm`}>
+								<Button className={`${menuBtnStyles} px-2 py-1 text-sm`}>
 									Actions
 									<IconChevronDown size="1.25rem" className="translate-y-0.5" />
 								</Button>
@@ -101,7 +101,7 @@ const SpotifyChangeButton = () => {
 		>
 			<Button
 				className={clsx(
-					menuButtonStyles,
+					menuBtnStyles,
 					"relative -top-1 mx-2 h-4 cursor-default px-1 text-[0.5rem] font-bold",
 				)}
 			>
@@ -128,7 +128,7 @@ const ToggleColorScheme = () => {
 	return (
 		<Tooltip tooltip="Toggle light/dark mode" delay={1000}>
 			<Button
-				className={`${menuButtonStyles} px-2 py-1`}
+				className={`${menuBtnStyles} px-2 py-1`}
 				aria-label={`Set ${isDark ? "light" : "dark"} color scheme`}
 				onPress={toggle}
 			>
