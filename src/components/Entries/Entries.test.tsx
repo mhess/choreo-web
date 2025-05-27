@@ -48,6 +48,8 @@ describe("Entries", () => {
 
 		user = userEvent.setup();
 		player = {
+			getCurrentTime: vi.fn(),
+			seekTo: vi.fn(),
 			addOnTick: vi.fn(),
 			removeOnTick: vi.fn(),
 			pause: vi.fn(),
@@ -55,11 +57,6 @@ describe("Entries", () => {
 
 		const { playerAtom } = getAtoms(platform);
 		setAtoms([[playerAtom, player]]);
-		localStorage.helpDismissed = true;
-	});
-
-	afterEach(() => {
-		localStorage.clear();
 	});
 
 	const getRenderedEntryValues = () =>
@@ -82,404 +79,447 @@ describe("Entries", () => {
 		return render(<Entries />, { wrapper });
 	};
 
-	it("Renders the initial entry with column headers", () => {
-		render(<Entries />, { wrapper });
+	describe("First visit", () => {
+		it('Shows "First time" dialog', async () => {
+			player.play = vi.fn();
+			arrange();
 
-		const headerRow = screen.getByRole("row");
+			expect(
+				await screen.findByRole("dialog", { name: "First time here?" }),
+			).toBeInTheDocument();
 
-		const headers = within(headerRow).getAllByRole("columnheader");
+			expect(
+				screen.queryByRole("button", { name: "Add Entry" }),
+			).not.toBeInTheDocument();
 
-		["Count", "Timestamp", "Note"].forEach((title, index) =>
-			expect(headers[index]).toHaveTextContent(title),
-		);
+			await user.click(screen.getByRole("button", { name: "Dismiss" }));
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				timeMs: 0,
-				count: 0,
-				isCurrent: true,
-				index: 0,
-			},
-		]);
+			expect(
+				screen.queryByRole("dialog", { name: "First time here?" }),
+			).not.toBeInTheDocument();
+
+			expect(
+				screen.getByRole("button", { name: "Show Help" }),
+			).toBeInTheDocument();
+
+			await user.click(screen.getByRole("button", { name: "Play" }));
+
+			await tickToTime(1000);
+
+			await user.click(screen.getByRole("button", { name: "Add Entry" }));
+		});
 	});
 
-	it("Renders the controls which control playback", async () => {
-		player.play = vi.fn();
-		const { pausedAtom } = getAtoms(platform);
-		arrange();
+	describe("Return visit", () => {
+		beforeEach(() => {
+			localStorage.setItem("helpDismissed", "t");
+		});
 
-		const controlsRegion = screen.getByRole("toolbar", { name: "Controls" });
+		it("Renders the initial entry with column headers", () => {
+			render(<Entries />, { wrapper });
 
-		const inControls = within(controlsRegion);
+			const headerRow = screen.getByRole("row");
 
-		expect(
-			inControls.queryByRole("button", { name: "Paused" }),
-		).not.toBeInTheDocument();
+			const headers = within(headerRow).getAllByRole("columnheader");
 
-		expect(player.play).not.toHaveBeenCalled();
-
-		await user.click(inControls.getByRole("button", { name: "Play" }));
-
-		expect(player.play).toHaveBeenCalledOnce();
-
-		await act(() => setAtoms([[pausedAtom, false]]));
-
-		expect(
-			inControls.getByRole("button", { name: "Pause" }),
-		).toBeInTheDocument();
-
-		expect(
-			inControls.queryByRole("button", { name: "Play" }),
-		).not.toBeInTheDocument();
-
-		await user.click(inControls.getByRole("button", { name: "Pause" }));
-
-		expect(player.pause).toHaveBeenCalledOnce();
-
-		player.seekTo = vi.fn();
-		player.getCurrentTime = vi.fn();
-
-		expect(player.seekTo).not.toHaveBeenCalled();
-		(player.getCurrentTime as Mock).mockReturnValue(Promise.resolve(12345));
-
-		await user.click(
-			inControls.getByRole("button", { name: "Fast-forward 5 sec" }),
-		);
-
-		expect(player.seekTo).toHaveBeenCalledOnce();
-		expect(player.seekTo).toHaveBeenCalledWith(17345);
-
-		await user.click(inControls.getByRole("button", { name: "Rewind 5 sec" }));
-
-		expect(player.seekTo).toHaveBeenCalledTimes(2);
-		expect(player.seekTo).toHaveBeenLastCalledWith(7345);
-	});
-
-	it("Highlights the current entry and updates the time display as the player is ticking", async () => {
-		player.getCurrentTime = vi.fn();
-
-		arrange([
-			{ timeMs: 0 },
-			{ timeMs: 1000 },
-			{ timeMs: 2000 },
-			{ timeMs: 3000 },
-		]);
-
-		const getHighlights = () =>
-			screen
-				.getAllByTestId("entry")
-				.map((e) => JSON.parse(e.textContent as string).isCurrent);
-
-		const getTimeDisplay = () =>
-			within(screen.getByRole("toolbar", { name: "Controls" })).getByText(
-				/\d:\d\d.\d\d/,
+			["Count", "Timestamp", "Note"].forEach((title, index) =>
+				expect(headers[index]).toHaveTextContent(title),
 			);
 
-		await tickToTime(0);
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					timeMs: 0,
+					count: 0,
+					isCurrent: true,
+					index: 0,
+				},
+			]);
+		});
 
-		expect(getHighlights()).toEqual([true, false, false, false]);
-		expect(getTimeDisplay()).toHaveTextContent("0:00.00");
+		it("Renders the controls which control playback", async () => {
+			player.play = vi.fn();
+			const { pausedAtom } = getAtoms(platform);
+			arrange();
 
-		await tickToTime(500);
+			const controlsRegion = screen.getByRole("toolbar", { name: "Controls" });
 
-		expect(getHighlights()).toEqual([true, false, false, false]);
-		expect(getTimeDisplay()).toHaveTextContent("0:00.50");
+			const inControls = within(controlsRegion);
 
-		await tickToTime(1000);
+			expect(
+				inControls.queryByRole("button", { name: "Paused" }),
+			).not.toBeInTheDocument();
 
-		expect(getHighlights()).toEqual([false, true, false, false]);
-		expect(getTimeDisplay()).toHaveTextContent("0:01.00");
+			expect(player.play).not.toHaveBeenCalled();
 
-		await tickToTime(1500);
+			await user.click(inControls.getByRole("button", { name: "Play" }));
 
-		expect(getHighlights()).toEqual([false, true, false, false]);
-		expect(getTimeDisplay()).toHaveTextContent("0:01.50");
+			expect(player.play).toHaveBeenCalledOnce();
 
-		await tickToTime(2000);
+			await act(() => setAtoms([[pausedAtom, false]]));
 
-		expect(getHighlights()).toEqual([false, false, true, false]);
-		expect(getTimeDisplay()).toHaveTextContent("0:02.00");
+			expect(
+				inControls.getByRole("button", { name: "Pause" }),
+			).toBeInTheDocument();
 
-		await tickToTime(3500);
+			expect(
+				inControls.queryByRole("button", { name: "Play" }),
+			).not.toBeInTheDocument();
 
-		expect(getHighlights()).toEqual([false, false, false, true]);
-		expect(getTimeDisplay()).toHaveTextContent("0:03.50");
-	});
+			await user.click(inControls.getByRole("button", { name: "Pause" }));
 
-	it("Adds a new entry correctly", async () => {
-		player.getCurrentTime = vi.fn();
+			expect(player.pause).toHaveBeenCalledOnce();
 
-		const initialEntries = [{ timeMs: 0 }, { timeMs: 1000 }, { timeMs: 2000 }];
-		arrange(initialEntries);
+			expect(player.seekTo).not.toHaveBeenCalled();
+			(player.getCurrentTime as Mock).mockReturnValue(Promise.resolve(12345));
 
-		await tickToTime(0);
+			await user.click(
+				inControls.getByRole("button", { name: "Fast-forward 5 sec" }),
+			);
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				count: 0,
-				isCurrent: true,
-				timeMs: 0,
-				index: 0,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 1000,
-				index: 1,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 2000,
-				index: 2,
-			},
-		]);
+			expect(player.seekTo).toHaveBeenCalledOnce();
+			expect(player.seekTo).toHaveBeenCalledWith(17345);
 
-		await user.click(screen.getByRole("button", { name: "Add Entry" }));
+			await user.click(
+				inControls.getByRole("button", { name: "Rewind 5 sec" }),
+			);
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				count: 0,
-				isCurrent: true,
-				timeMs: 0,
-				index: 0,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 1000,
-				index: 1,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 2000,
-				index: 2,
-			},
-		]);
+			expect(player.seekTo).toHaveBeenCalledTimes(2);
+			expect(player.seekTo).toHaveBeenLastCalledWith(7345);
+		});
 
-		await tickToTime(500);
+		it("Highlights the current entry and updates the time display as the player is ticking", async () => {
+			player.getCurrentTime = vi.fn();
 
-		await user.click(screen.getByRole("button", { name: "Add Entry" }));
+			arrange([
+				{ timeMs: 0 },
+				{ timeMs: 1000 },
+				{ timeMs: 2000 },
+				{ timeMs: 3000 },
+			]);
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 0,
-				index: 0,
-			},
-			{
-				count: 0,
-				isCurrent: true,
-				timeMs: 500,
-				index: 1,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 1000,
-				index: 2,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 2000,
-				index: 3,
-			},
-		]);
+			const getHighlights = () =>
+				screen
+					.getAllByTestId("entry")
+					.map((e) => JSON.parse(e.textContent as string).isCurrent);
 
-		const { entriesAtom } = getAtoms(platform);
-		setAtoms([[entriesAtom, initialEntries]]);
+			const getTimeDisplay = () =>
+				within(screen.getByRole("toolbar", { name: "Controls" })).getByText(
+					/\d:\d\d.\d\d/,
+				);
 
-		await tickToTime(1000);
+			await tickToTime(0);
 
-		await user.click(screen.getByRole("button", { name: "Add Entry" }));
+			expect(getHighlights()).toEqual([true, false, false, false]);
+			expect(getTimeDisplay()).toHaveTextContent("0:00.00");
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 0,
-				index: 0,
-			},
-			{
-				count: 0,
-				isCurrent: true,
-				timeMs: 1000,
-				index: 1,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 2000,
-				index: 2,
-			},
-		]);
+			await tickToTime(500);
 
-		setAtoms([[entriesAtom, initialEntries]]);
+			expect(getHighlights()).toEqual([true, false, false, false]);
+			expect(getTimeDisplay()).toHaveTextContent("0:00.50");
 
-		await tickToTime(1500);
+			await tickToTime(1000);
 
-		await user.click(screen.getByRole("button", { name: "Add Entry" }));
+			expect(getHighlights()).toEqual([false, true, false, false]);
+			expect(getTimeDisplay()).toHaveTextContent("0:01.00");
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 0,
-				index: 0,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 1000,
-				index: 1,
-			},
-			{
-				count: 0,
-				isCurrent: true,
-				timeMs: 1500,
-				index: 2,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 2000,
-				index: 3,
-			},
-		]);
+			await tickToTime(1500);
 
-		setAtoms([[entriesAtom, initialEntries]]);
+			expect(getHighlights()).toEqual([false, true, false, false]);
+			expect(getTimeDisplay()).toHaveTextContent("0:01.50");
 
-		await tickToTime(3000);
+			await tickToTime(2000);
 
-		await user.click(screen.getByRole("button", { name: "Add Entry" }));
+			expect(getHighlights()).toEqual([false, false, true, false]);
+			expect(getTimeDisplay()).toHaveTextContent("0:02.00");
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 0,
-				index: 0,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 1000,
-				index: 1,
-			},
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 2000,
-				index: 2,
-			},
-			{
-				count: 0,
-				isCurrent: true,
-				timeMs: 3000,
-				index: 3,
-			},
-		]);
-	});
+			await tickToTime(3500);
 
-	it("Fills in new count if previous two entries have counts", async () => {
-		player.getCurrentTime = vi.fn();
+			expect(getHighlights()).toEqual([false, false, false, true]);
+			expect(getTimeDisplay()).toHaveTextContent("0:03.50");
+		});
 
-		const { entriesAtom } = getAtoms(platform);
-		setAtoms([[entriesAtom, [{ timeMs: 0 }, { timeMs: 1000, count: 4 }]]]);
+		it("Adds a new entry correctly", async () => {
+			player.getCurrentTime = vi.fn();
 
-		(player.getCurrentTime as Mock).mockReturnValue(Promise.resolve(1495));
+			const initialEntries = [
+				{ timeMs: 0 },
+				{ timeMs: 1000 },
+				{ timeMs: 2000 },
+			];
+			arrange(initialEntries);
 
-		render(<Entries />, { wrapper });
+			await tickToTime(0);
 
-		await user.click(screen.getByRole("button", { name: "Add Entry" }));
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					count: 0,
+					isCurrent: true,
+					timeMs: 0,
+					index: 0,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 1000,
+					index: 1,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 2000,
+					index: 2,
+				},
+			]);
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				count: 0,
-				isCurrent: false,
-				timeMs: 0,
-				index: 0,
-			},
-			{
-				count: 4,
-				isCurrent: false,
-				timeMs: 1000,
-				index: 1,
-			},
-			{
-				count: 6,
-				isCurrent: true,
-				timeMs: 1495,
-				index: 2,
-			},
-		]);
-	});
+			await user.click(screen.getByRole("button", { name: "Add Entry" }));
 
-	it(`Renders/hides help content when the "Help" button is clicked`, async () => {
-		localStorage.clear();
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					count: 0,
+					isCurrent: true,
+					timeMs: 0,
+					index: 0,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 1000,
+					index: 1,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 2000,
+					index: 2,
+				},
+			]);
 
-		const { unmount } = render(<Entries />, { wrapper });
+			await tickToTime(500);
 
-		expect(screen.queryByTestId("help")).not.toBeInTheDocument();
+			await user.click(screen.getByRole("button", { name: "Add Entry" }));
 
-		// Using this less efficient query bc it's the same used to assert element
-		// not rendered.
-		const findTooltip = () =>
-			waitFor(() => screen.getByRole("dialog", { name: "First time here?" }), {
-				interval: 10,
-				timeout: 30,
-			});
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 0,
+					index: 0,
+				},
+				{
+					count: 0,
+					isCurrent: true,
+					timeMs: 500,
+					index: 1,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 1000,
+					index: 2,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 2000,
+					index: 3,
+				},
+			]);
 
-		await findTooltip();
+			const { entriesAtom } = getAtoms(platform);
+			setAtoms([[entriesAtom, initialEntries]]);
 
-		await user.click(screen.getByRole("button", { name: "Show Help" }));
+			await tickToTime(1000);
 
-		expect(
-			screen.queryByRole("dialog", { name: "First time here?" }),
-		).not.toBeInTheDocument();
+			await user.click(screen.getByRole("button", { name: "Add Entry" }));
 
-		expect(screen.getByTestId("help")).toBeInTheDocument();
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 0,
+					index: 0,
+				},
+				{
+					count: 0,
+					isCurrent: true,
+					timeMs: 1000,
+					index: 1,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 2000,
+					index: 2,
+				},
+			]);
 
-		await user.click(screen.getByRole("button", { name: "Hide Help" }));
+			setAtoms([[entriesAtom, initialEntries]]);
 
-		expect(screen.queryByTestId("help")).not.toBeInTheDocument();
+			await tickToTime(1500);
 
-		unmount();
+			await user.click(screen.getByRole("button", { name: "Add Entry" }));
 
-		render(<Entries />, { wrapper });
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 0,
+					index: 0,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 1000,
+					index: 1,
+				},
+				{
+					count: 0,
+					isCurrent: true,
+					timeMs: 1500,
+					index: 2,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 2000,
+					index: 3,
+				},
+			]);
 
-		await expect(findTooltip).rejects.toThrow(
-			'Unable to find role="dialog" and name "First time here?"',
-		);
-	});
+			setAtoms([[entriesAtom, initialEntries]]);
 
-	it("Pauses the player when unmounted", async () => {
-		const { unmount } = arrange();
+			await tickToTime(3000);
 
-		expect(player.pause).not.toHaveBeenCalled();
+			await user.click(screen.getByRole("button", { name: "Add Entry" }));
 
-		await act(unmount);
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 0,
+					index: 0,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 1000,
+					index: 1,
+				},
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 2000,
+					index: 2,
+				},
+				{
+					count: 0,
+					isCurrent: true,
+					timeMs: 3000,
+					index: 3,
+				},
+			]);
+		});
 
-		expect(player.pause).toHaveBeenCalledOnce();
-	});
+		it("Fills in new count if previous two entries have counts", async () => {
+			player.getCurrentTime = vi.fn();
 
-	it("Preserves the existing entries when remounted", () => {
-		const { unmount } = arrange([{ timeMs: 0, count: 1 }]);
+			const { entriesAtom } = getAtoms(platform);
+			setAtoms([[entriesAtom, [{ timeMs: 0 }, { timeMs: 1000, count: 4 }]]]);
 
-		unmount();
+			(player.getCurrentTime as Mock).mockReturnValue(Promise.resolve(1495));
 
-		render(<Entries />, { wrapper });
+			render(<Entries />, { wrapper });
 
-		expect(getRenderedEntryValues()).toEqual([
-			{
-				timeMs: 0,
-				count: 1,
-				index: 0,
-				isCurrent: false,
-			},
-		]);
+			await user.click(screen.getByRole("button", { name: "Add Entry" }));
+
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					count: 0,
+					isCurrent: false,
+					timeMs: 0,
+					index: 0,
+				},
+				{
+					count: 4,
+					isCurrent: false,
+					timeMs: 1000,
+					index: 1,
+				},
+				{
+					count: 6,
+					isCurrent: true,
+					timeMs: 1495,
+					index: 2,
+				},
+			]);
+		});
+
+		it(`Renders/hides help content when the "Help" button is clicked`, async () => {
+			localStorage.clear();
+
+			const { unmount } = render(<Entries />, { wrapper });
+
+			expect(screen.queryByTestId("help")).not.toBeInTheDocument();
+
+			// Using this less efficient query bc it's the same used to assert element
+			// not rendered.
+			const findTooltip = () =>
+				waitFor(
+					() => screen.getByRole("dialog", { name: "First time here?" }),
+					{
+						interval: 10,
+						timeout: 30,
+					},
+				);
+
+			await findTooltip();
+
+			await user.click(screen.getByRole("button", { name: "Show Help" }));
+
+			expect(
+				screen.queryByRole("dialog", { name: "First time here?" }),
+			).not.toBeInTheDocument();
+
+			expect(screen.getByTestId("help")).toBeInTheDocument();
+
+			await user.click(screen.getByRole("button", { name: "Hide Help" }));
+
+			expect(screen.queryByTestId("help")).not.toBeInTheDocument();
+
+			unmount();
+
+			render(<Entries />, { wrapper });
+
+			await expect(findTooltip).rejects.toThrow(
+				'Unable to find role="dialog" and name "First time here?"',
+			);
+		});
+
+		it("Pauses the player when unmounted", async () => {
+			const { unmount } = arrange();
+
+			expect(player.pause).not.toHaveBeenCalled();
+
+			act(unmount);
+
+			expect(player.pause).toHaveBeenCalledOnce();
+		});
+
+		it("Preserves the existing entries when remounted", () => {
+			const { unmount } = arrange([{ timeMs: 0, count: 1 }]);
+
+			unmount();
+
+			render(<Entries />, { wrapper });
+
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					timeMs: 0,
+					count: 1,
+					index: 0,
+					isCurrent: false,
+				},
+			]);
+		});
 	});
 });

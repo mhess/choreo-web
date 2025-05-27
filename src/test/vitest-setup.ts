@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach, vi } from "vitest";
+import { afterEach, beforeEach, vi } from "vitest";
 
 // @ts-expect-error shutup ts
 global.Blob = class Blob {
@@ -29,6 +29,10 @@ global.File = class File extends Blob {
 
 global.URL.createObjectURL = vi.fn();
 global.URL.revokeObjectURL = vi.fn();
+
+beforeEach(() => {
+	localStorage.clear();
+});
 
 afterEach(cleanup);
 
