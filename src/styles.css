@@ -1,14 +1,30 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+#root {
+	@apply flex h-full flex-col;
+}
+
 @layer base {
 	:root,
 	body {
 		@apply h-full bg-zinc-50 font-sans text-zinc-800 dark:bg-zinc-800 dark:text-zinc-50;
 	}
 
+	a {
+		@apply text-violet-800 underline dark:text-violet-400;
+	}
+
+	button,
+	[role="button"],
+	[role="menuitem"] {
+		@apply cursor-pointer disabled:cursor-not-allowed;
+	}
+
+	/* Focus styling */
+
 	input {
-		@apply bg-zinc-50 outline-none outline-1 focus-visible:outline-cyan-700 dark:bg-gray-700 dark:focus-visible:outline-orange-400;
+		@apply bg-zinc-50 outline-1 outline-none focus-visible:outline-cyan-700 dark:bg-gray-700 dark:focus-visible:outline-orange-400;
 	}
 
 	button,
@@ -16,16 +32,4 @@
 	[role="dialog"] {
 		@apply outline-none data-[focus-visible]:outline-blue-700 dark:data-[focus-visible]:outline-orange-400;
 	}
-
-	a {
-		@apply text-violet-800 underline dark:text-violet-400;
-	}
-}
-
-.react-aria-ModalOverlay {
-	@apply fixed inset-0 flex items-center justify-center bg-black/75;
-}
-
-#root {
-	@apply flex h-full flex-col;
 }

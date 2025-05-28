@@ -39,7 +39,7 @@ export default function Header() {
 			<div className="flex min-w-0 flex-nowrap items-center gap-4">
 				<Button
 					onPress={() => setPlatform("landing")}
-					className="cursor-pointer p-2 text-lg font-bold text-violet-700 uppercase dark:text-violet-500 dark:brightness-200"
+					className="p-2 text-lg font-bold text-violet-700 uppercase dark:text-violet-500 dark:brightness-200"
 				>
 					Choreo
 				</Button>

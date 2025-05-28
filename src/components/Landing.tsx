@@ -8,7 +8,7 @@ import { ctlBarBgStyles } from "~/styles";
 
 import { AudioFile, Spotify, YouTube } from "./Logos";
 
-const btnStyles = tw`${ctlBarBgStyles} flex cursor-pointer items-center rounded border border-zinc-400 px-4 py-1 hover:brightness-95 dark:border-zinc-600 dark:hover:brightness-110`;
+const btnStyles = tw`${ctlBarBgStyles} flex items-center rounded border border-zinc-400 px-4 py-1 hover:brightness-95 dark:border-zinc-600 dark:hover:brightness-110`;
 
 export default function Landing() {
 	const isMobile = useIsMobile();
