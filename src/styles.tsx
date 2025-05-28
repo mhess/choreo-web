@@ -17,3 +17,8 @@ export const menuBtnStyles = clsx(
 );
 
 export const actionBtnStyles = tw`cursor-pointer rounded border border-zinc-500 bg-violet-600 px-4 py-2 text-zinc-50 enabled:hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-violet-800 enabled:dark:hover:brightness-110 dark:disabled:bg-slate-500`;
+
+export const columnWidthStyles = {
+	count: tw`w-16`,
+	timestamp: tw`w-[6rem]`,
+};

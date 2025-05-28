@@ -5,11 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { setOnIndexChangeAtom, useEntryAtoms } from "~/lib/entries";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { tw } from "~/lib/utils";
+import { columnWidthStyles } from "~/styles";
 
 import Controls from "./Controls";
 import Entry from "./Entry";
 import Help from "./Help";
-import { COUNT_LABEL, NOTE_LABEL, countWidth } from "./shared";
+import { COUNT_LABEL, NOTE_LABEL } from "./shared";
 
 export default function Entries() {
 	const player = useEstablishedPlayer();
@@ -71,17 +72,18 @@ const borderStyles = tw`border-r border-solid border-gray-800 dark:border-gray-5
 const countStyles = clsx(
 	textStyles,
 	borderStyles,
-	countWidth,
-	"pr-2 text-right",
+	columnWidthStyles.count,
+	"text-center",
 );
 
 const timestampStyles = clsx(
 	textStyles,
 	borderStyles,
-	"w-[5.5rem] text-center",
+	columnWidthStyles.timestamp,
+	"text-center",
 );
 
-const noteStyles = clsx(textStyles, "ml-2");
+const noteStyles = clsx(textStyles, "ml-3");
 
 const EntryHeader = () => (
 	<div role="row" className="flex py-2 pl-4 lowercase">

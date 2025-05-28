@@ -14,7 +14,7 @@ import Tooltip, { tooltipStyles } from "~/components/Tooltip";
 import { type AtomicEntry, entryAtomsForPlatformAtom } from "~/lib/entries";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { displayMs } from "~/lib/utils";
-import { actionBtnStyles } from "~/styles";
+import { actionBtnStyles, columnWidthStyles } from "~/styles";
 
 import { COUNT_LABEL, NOTE_LABEL } from "./shared";
 
@@ -97,7 +97,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 					</DialogTrigger>
 				) : undefined}
 				<InputWithAtom
-					className="w-12 rounded px-2 py-0.5 text-right"
+					className={`${columnWidthStyles.count} rounded px-2 py-0.5 text-right`}
 					aria-label={COUNT_LABEL}
 					type="number"
 					atom={countAtom}
@@ -105,7 +105,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 			</div>
 			<Button
 				aria-label={`Seek to ${displayTime}`}
-				className="w-[5.5rem] cursor-pointer px-4 py-2 text-right hover:text-blue-400"
+				className={`${columnWidthStyles.timestamp} cursor-pointer px-4 py-2 text-right hover:text-blue-400`}
 				onPress={() => player.seekTo(timeMs)}
 			>
 				{displayTime}
