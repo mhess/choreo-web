@@ -1,5 +1,15 @@
 import { IconHelp } from "@tabler/icons-react";
-import { cloneElement, useEffect, useRef, useState } from "react";
+import clsx from "clsx";
+import {
+	type CSSProperties,
+	type ComponentProps,
+	type ForwardedRef,
+	type MutableRefObject,
+	forwardRef,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { Overlay, useDialog, useModalOverlay } from "react-aria";
 import { Button } from "react-aria-components";
 import { createPortal } from "react-dom";
@@ -23,15 +33,23 @@ export default function HelpButton(props: Props) {
 	const dialogRef = useRef(null);
 	const modalRef = useRef(null);
 
-	const state = useModalState();
+	const dialogState = useModalState();
 
-	const { underlayProps, modalProps } = useModalOverlay({}, state, modalRef);
+	const { underlayProps, modalProps } = useModalOverlay(
+		{},
+		dialogState,
+		modalRef,
+	);
 	const { dialogProps, titleProps } = useDialog({}, dialogRef);
 
 	return (
 		<>
-			<TriggerButton dialogRef={dialogRef} dialogState={state} help={help} />
-			{state.isOpen && (
+			<HelpTriggerButton
+				dialogRef={dialogRef}
+				dialog={dialogState}
+				help={help}
+			/>
+			{dialogState.isOpen && (
 				<Overlay>
 					<div
 						{...underlayProps}
@@ -57,7 +75,7 @@ export default function HelpButton(props: Props) {
 										of the screen to toggle the help messages!
 									</p>
 									<Button
-										onPress={state.close}
+										onPress={dialogState.close}
 										className={`${actionBtnStyles} self-end`}
 									>
 										Dismiss
@@ -78,68 +96,97 @@ const helpBtnStyles = tw`${menuBtnStyles} px-2 py-1 text-sm`;
 interface TriggerButtonProps {
 	help: HelpState;
 	dialogRef: React.MutableRefObject<HTMLDivElement | null>;
-	dialogState: ReturnType<typeof useModalState>;
+	dialog: ReturnType<typeof useModalState>;
 }
 
-function TriggerButton(props: TriggerButtonProps) {
-	const isMobile = useIsMobile();
+function HelpTriggerButton(props: TriggerButtonProps) {
+	const { help, dialogRef, dialog } = props;
+
 	const btnRef = useRef<HTMLButtonElement>(null);
-	const { help, dialogRef, dialogState: dialog } = props;
-	const [dialogBtnPositionStyles, setDialogBtnPositionStyles] =
-		useState<React.CSSProperties>();
-
-	useEffect(() => {
-		if (dialogBtnPositionStyles) setDialogBtnPositionStyles(undefined);
-	}, [isMobile, dialog.isOpen]);
-
-	useEffect(() => {
-		if (dialog.isOpen && !dialogBtnPositionStyles) {
-			const { right: fromLeft, bottom: fromTop } =
-				btnRef.current!.getBoundingClientRect();
-			const right = isMobile ? "50%" : window.innerWidth - fromLeft;
-			const bottom = window.innerHeight - fromTop;
-			const transform = isMobile ? "translateX(50%)" : undefined;
-
-			setDialogBtnPositionStyles({ right, bottom, transform });
-		}
-	}, [dialogBtnPositionStyles]);
 
 	const handlePress = () => {
 		if (dialog.isOpen) dialog.close();
 		help.toggle();
 	};
 
-	const btnEl = (
-		<Button ref={btnRef} className={helpBtnStyles} onPress={handlePress}>
-			{help.isShowing ? "Hide" : "Show"} Help
-			<IconHelp size="1.25rem" className="ml-1" />
-		</Button>
-	);
-
-	const shouldShowDialogButton = Boolean(
-		dialog.isOpen && dialogBtnPositionStyles,
-	);
-
-	const dialogButton = shouldShowDialogButton
-		? createPortal(
-				cloneElement(btnEl, {
-					style: dialogBtnPositionStyles,
-					className: `${helpBtnStyles} ${dialogBtnStyles}`,
-				}),
-				dialogRef.current!,
-			)
-		: null;
+	const simpleBtnProps = {
+		isHelpShowing: help.isShowing,
+		onPress: handlePress,
+	};
 
 	return (
 		<>
-			{btnEl}
-			{dialogButton}
+			{<SimpleHelpButton ref={btnRef} {...simpleBtnProps} />}
+			{dialog.isOpen && (
+				<DialogHelpButton
+					{...simpleBtnProps}
+					originalBtnRef={btnRef}
+					dialogRef={dialogRef}
+				/>
+			)}
 		</>
 	);
 }
 
+interface DialogHelpButtonProps extends SimpleHelpButtonProps {
+	dialogRef: MutableRefObject<HTMLElement | null>;
+	originalBtnRef: MutableRefObject<HTMLButtonElement | null>;
+}
+
+const DialogHelpButton = (props: DialogHelpButtonProps) => {
+	const { originalBtnRef, dialogRef, ...simpleButtonProps } = props;
+
+	const [positionStyling, setPositionStyling] = useState<CSSProperties>();
+	const isMobile = useIsMobile();
+
+	useEffect(() => {
+		const { right: fromLeft, bottom: fromTop } =
+			originalBtnRef.current!.getBoundingClientRect();
+		const right = isMobile ? "50%" : window.innerWidth - fromLeft;
+		const bottom = window.innerHeight - fromTop;
+		const transform = isMobile ? "translateX(50%)" : undefined;
+
+		setPositionStyling({ right, bottom, transform });
+	}, [isMobile]);
+
+	return positionStyling
+		? createPortal(
+				<SimpleHelpButton
+					{...simpleButtonProps}
+					style={positionStyling}
+					className={dialogBtnStyles}
+				/>,
+				dialogRef.current!,
+			)
+		: null;
+};
+
+interface SimpleHelpButtonProps extends ComponentProps<typeof Button> {
+	isHelpShowing: boolean;
+}
+
+const SimpleHelpButton = forwardRef(function SimpleHelpButton(
+	props: SimpleHelpButtonProps,
+	ref: ForwardedRef<HTMLButtonElement>,
+) {
+	const { isHelpShowing, className, ...otherProps } = props;
+
+	return (
+		<Button
+			ref={ref}
+			className={clsx(helpBtnStyles, className)}
+			{...otherProps}
+		>
+			{isHelpShowing ? "Hide" : "Show"} Help
+			<IconHelp size="1.25rem" className="ml-1" />
+		</Button>
+	);
+});
+
 const useModalState = () => {
-	const [isOpen, setOpen] = useState(!localStorage.getItem("helpDismissed"));
+	const [isOpen, setOpen] = useState(
+		localStorage.getItem("helpDismissed") !== "t",
+	);
 
 	return {
 		open: () => setOpen(true),

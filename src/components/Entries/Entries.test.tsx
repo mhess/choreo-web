@@ -2,15 +2,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
 import { useAtom } from "jotai";
-import {
-	type Mock,
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-} from "vitest";
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AtomicEntry, EntryInput } from "~/lib/entries";
 import type { PlatformPlayer } from "~/lib/player";
@@ -72,18 +64,19 @@ describe("Entries", () => {
 				await call[0](timeMs);
 		});
 
-	const arrange = (entryInputs = [] as EntryInput[]) => {
-		const { entriesAtom } = getAtoms(platform);
-		setAtoms([[entriesAtom, entryInputs]]);
+	const arrange = (entryInputs = [] as EntryInput[] | false) => {
+		if (entryInputs) {
+			const { entriesAtom } = getAtoms(platform);
+			setAtoms([[entriesAtom, entryInputs]]);
+		}
 
 		return render(<Entries />, { wrapper });
 	};
 
 	describe("First visit", () => {
-		it('Shows "First time" dialog', async () => {
+		const arrangeFirstVisit = async () => {
 			player.play = vi.fn();
 			arrange();
-
 			expect(
 				await screen.findByRole("dialog", { name: "First time here?" }),
 			).toBeInTheDocument();
@@ -91,12 +84,14 @@ describe("Entries", () => {
 			expect(
 				screen.queryByRole("button", { name: "Add Entry" }),
 			).not.toBeInTheDocument();
+		};
 
-			await user.click(screen.getByRole("button", { name: "Dismiss" }));
-
+		const checkLocalStorageAndAddEntry = async () => {
 			expect(
 				screen.queryByRole("dialog", { name: "First time here?" }),
 			).not.toBeInTheDocument();
+
+			expect(localStorage.getItem("helpDismissed")).toBe("t");
 
 			expect(
 				screen.getByRole("button", { name: "Show Help" }),
@@ -107,6 +102,43 @@ describe("Entries", () => {
 			await tickToTime(1000);
 
 			await user.click(screen.getByRole("button", { name: "Add Entry" }));
+
+			expect(getRenderedEntryValues()).toEqual([
+				{
+					timeMs: 0,
+					count: 0,
+					isCurrent: false,
+					index: 0,
+				},
+				{
+					timeMs: 1000,
+					count: 0,
+					isCurrent: true,
+					index: 1,
+				},
+			]);
+		};
+
+		it('Shows "First time" dialog and correctly dismisses', async () => {
+			await arrangeFirstVisit();
+
+			await user.click(screen.getByRole("button", { name: "Dismiss" }));
+
+			await checkLocalStorageAndAddEntry();
+		});
+
+		it('Can show help from "First time" dialog', async () => {
+			await arrangeFirstVisit();
+
+			await user.click(screen.getByRole("button", { name: "Show Help" }));
+
+			expect(screen.getByTestId("help")).toBeInTheDocument();
+
+			await user.click(screen.getByRole("button", { name: "Hide Help" }));
+
+			expect(screen.queryByTestId("help")).not.toBeInTheDocument();
+
+			await checkLocalStorageAndAddEntry();
 		});
 	});
 
@@ -116,7 +148,7 @@ describe("Entries", () => {
 		});
 
 		it("Renders the initial entry with column headers", () => {
-			render(<Entries />, { wrapper });
+			arrange();
 
 			const headerRow = screen.getByRole("row");
 
@@ -139,6 +171,7 @@ describe("Entries", () => {
 		it("Renders the controls which control playback", async () => {
 			player.play = vi.fn();
 			const { pausedAtom } = getAtoms(platform);
+
 			arrange();
 
 			const controlsRegion = screen.getByRole("toolbar", { name: "Controls" });
@@ -155,7 +188,7 @@ describe("Entries", () => {
 
 			expect(player.play).toHaveBeenCalledOnce();
 
-			await act(() => setAtoms([[pausedAtom, false]]));
+			act(() => setAtoms([[pausedAtom, false]]));
 
 			expect(
 				inControls.getByRole("button", { name: "Pause" }),
@@ -246,6 +279,7 @@ describe("Entries", () => {
 				{ timeMs: 1000 },
 				{ timeMs: 2000 },
 			];
+
 			arrange(initialEntries);
 
 			await tickToTime(0);
@@ -421,14 +455,12 @@ describe("Entries", () => {
 		});
 
 		it("Fills in new count if previous two entries have counts", async () => {
-			player.getCurrentTime = vi.fn();
-
-			const { entriesAtom } = getAtoms(platform);
-			setAtoms([[entriesAtom, [{ timeMs: 0 }, { timeMs: 1000, count: 4 }]]]);
+			// const { entriesAtom } = getAtoms(platform);
+			// setAtoms([[entriesAtom, [{ timeMs: 0 }, { timeMs: 1000, count: 4 }]]]);
 
 			(player.getCurrentTime as Mock).mockReturnValue(Promise.resolve(1495));
 
-			render(<Entries />, { wrapper });
+			arrange([{ timeMs: 0 }, { timeMs: 1000, count: 4 }]);
 
 			await user.click(screen.getByRole("button", { name: "Add Entry" }));
 
@@ -455,44 +487,17 @@ describe("Entries", () => {
 		});
 
 		it(`Renders/hides help content when the "Help" button is clicked`, async () => {
-			localStorage.clear();
-
-			const { unmount } = render(<Entries />, { wrapper });
+			arrange();
 
 			expect(screen.queryByTestId("help")).not.toBeInTheDocument();
 
-			// Using this less efficient query bc it's the same used to assert element
-			// not rendered.
-			const findTooltip = () =>
-				waitFor(
-					() => screen.getByRole("dialog", { name: "First time here?" }),
-					{
-						interval: 10,
-						timeout: 30,
-					},
-				);
-
-			await findTooltip();
-
 			await user.click(screen.getByRole("button", { name: "Show Help" }));
-
-			expect(
-				screen.queryByRole("dialog", { name: "First time here?" }),
-			).not.toBeInTheDocument();
 
 			expect(screen.getByTestId("help")).toBeInTheDocument();
 
 			await user.click(screen.getByRole("button", { name: "Hide Help" }));
 
 			expect(screen.queryByTestId("help")).not.toBeInTheDocument();
-
-			unmount();
-
-			render(<Entries />, { wrapper });
-
-			await expect(findTooltip).rejects.toThrow(
-				'Unable to find role="dialog" and name "First time here?"',
-			);
 		});
 
 		it("Pauses the player when unmounted", async () => {
@@ -510,7 +515,7 @@ describe("Entries", () => {
 
 			unmount();
 
-			render(<Entries />, { wrapper });
+			arrange(false);
 
 			expect(getRenderedEntryValues()).toEqual([
 				{
