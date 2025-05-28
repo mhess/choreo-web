@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { Header, Section } from "react-aria-components";
+import { Header, MenuSection } from "react-aria-components";
 
 import MenuItem from "~/components/MenuItem";
 import { type Platform, platformAtom } from "~/lib/platformAtoms";
@@ -13,7 +13,7 @@ export default function PlatformItems() {
 	const [platform, setPlatform] = useAtom(platformAtom);
 
 	return (
-		<Section>
+		<MenuSection>
 			<Header className="mb-2 text-xs">Switch to</Header>
 			{platform !== "spotify" && (
 				<MenuItem onAction={() => setPlatform("spotify")}>
@@ -33,7 +33,7 @@ export default function PlatformItems() {
 					{labelByPlatform.audioFile}
 				</MenuItem>
 			)}
-		</Section>
+		</MenuSection>
 	);
 }
 
