@@ -35,7 +35,7 @@ export default function Tooltip(props: Props) {
 const arrowStyles = tw`fill-slate-100 stroke-slate-400 dark:fill-slate-700 dark:stroke-slate-500`;
 
 export const withArrow = (content: React.ReactNode) =>
-	function renderArrow({ placement }: { placement: string }) {
+	function renderArrow({ placement }: { placement: string | null }) {
 		return (
 			<>
 				<OverlayArrow className={arrowStyles}>
