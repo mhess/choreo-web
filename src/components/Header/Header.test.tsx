@@ -75,7 +75,7 @@ describe("Header", () => {
 				).not.toBeInTheDocument();
 
 				expect(
-					screen.getByRole("button", { name: "Toggle light/dark mode" }),
+					screen.getByRole("button", { name: "Set dark color scheme" }),
 				).toBeInTheDocument();
 
 				const selectPlatformBtn = screen.getByRole("button", {
