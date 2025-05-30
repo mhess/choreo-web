@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { type PropsWithChildren, useEffect, useState } from "react";
-import { Button } from "react-aria-components";
+import { Button, Input } from "react-aria-components";
 
 import Loading from "~/components/Loading";
 import { actionBtnStyles } from "~/styles";
@@ -61,7 +61,7 @@ const UrlForm = ({ cueVideo, wasBadId, inputState }: UrlFormProps) => {
 			<div className="mx-4 mt-8 mb-4 flex max-w-sm flex-1 flex-col items-center gap-4 text-center">
 				<p>Please enter a YouTube video URL or ID</p>
 				<div className="flex w-full flex-col gap-2">
-					<input
+					<Input
 						value={input}
 						className={clsx(
 							"w-full rounded border px-2 py-0.5 text-center",

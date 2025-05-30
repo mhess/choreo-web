@@ -27,6 +27,7 @@ button,
 input,
 button,
 [role="menuitem"] {
+	/* React Aria elements recieve the data-[focus-visible] when focused from tabbing with keyboard */
 	@apply outline-2 outline-offset-2 outline-transparent data-[focus-visible]:outline-cyan-500 dark:data-[focus-visible]:outline-orange-400;
 }
 

@@ -1,4 +1,5 @@
 import { type WritableAtom, useAtom } from "jotai";
+import { Input } from "react-aria-components";
 
 interface Props<T>
 	extends Omit<React.ComponentPropsWithRef<"input">, "onChange"> {
@@ -18,7 +19,7 @@ export default function InputWithAtom<T extends string | number>(
 
 	const newProps = { ...rest, value, onChange };
 
-	return <input {...newProps} />;
+	return <Input {...newProps} />;
 }
 
 const ensureNumber = (input: string): number => {
