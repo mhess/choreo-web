@@ -28,6 +28,14 @@ vi.mock("./Help", () => ({
 	default: () => <div data-testid="help" />,
 }));
 
+const getCurrentTimeImpl = (() => {
+	throw "getCurrentTime not mocked!";
+}) as () => Promise<number>;
+
+const pauseImpl = (() => {
+	throw "pause not mocked!";
+}) as () => Promise<void>;
+
 describe("Entries", () => {
 	const platform = "spotify";
 	let user: UserEvent;
@@ -40,11 +48,9 @@ describe("Entries", () => {
 
 		user = userEvent.setup();
 		player = {
-			getCurrentTime: vi.fn(),
-			seekTo: vi.fn(),
+			pause: vi.fn(pauseImpl).mockResolvedValueOnce(),
 			addOnTick: vi.fn(),
 			removeOnTick: vi.fn(),
-			pause: vi.fn(),
 		} as unknown as PlatformPlayer;
 
 		const { playerAtom } = getAtoms(platform);
@@ -58,7 +64,9 @@ describe("Entries", () => {
 
 	const tickToTime = (timeMs: number) =>
 		act(async () => {
-			(player.getCurrentTime as Mock).mockReturnValue(Promise.resolve(timeMs));
+			player.getCurrentTime = vi
+				.fn(getCurrentTimeImpl)
+				.mockResolvedValueOnce(timeMs);
 
 			for (const call of (player.addOnTick as Mock).mock.calls)
 				await call[0](timeMs);
@@ -76,6 +84,7 @@ describe("Entries", () => {
 	describe("First visit", () => {
 		const arrangeFirstVisit = async () => {
 			player.play = vi.fn();
+
 			arrange();
 			expect(
 				await screen.findByRole("dialog", { name: "First time here?" }),
@@ -170,6 +179,8 @@ describe("Entries", () => {
 
 		it("Renders the controls which control playback", async () => {
 			player.play = vi.fn();
+			player.seekTo = vi.fn();
+
 			const { pausedAtom } = getAtoms(platform);
 
 			arrange();
@@ -188,7 +199,7 @@ describe("Entries", () => {
 
 			expect(player.play).toHaveBeenCalledOnce();
 
-			act(() => setAtoms([[pausedAtom, false]]));
+			await act(async () => setAtoms([[pausedAtom, false]]));
 
 			expect(
 				inControls.getByRole("button", { name: "Pause" }),
@@ -198,12 +209,17 @@ describe("Entries", () => {
 				inControls.queryByRole("button", { name: "Play" }),
 			).not.toBeInTheDocument();
 
+			await tickToTime(12345);
+
+			expect(player.seekTo).not.toHaveBeenCalled();
+
+			(player.pause as Mock<typeof pauseImpl>).mockResolvedValueOnce();
+
 			await user.click(inControls.getByRole("button", { name: "Pause" }));
 
 			expect(player.pause).toHaveBeenCalledOnce();
 
 			expect(player.seekTo).not.toHaveBeenCalled();
-			(player.getCurrentTime as Mock).mockReturnValue(Promise.resolve(12345));
 
 			await user.click(
 				inControls.getByRole("button", { name: "Fast-forward 5 sec" }),
@@ -212,17 +228,17 @@ describe("Entries", () => {
 			expect(player.seekTo).toHaveBeenCalledOnce();
 			expect(player.seekTo).toHaveBeenCalledWith(17345);
 
+			await tickToTime(17345);
+
 			await user.click(
 				inControls.getByRole("button", { name: "Rewind 5 sec" }),
 			);
 
 			expect(player.seekTo).toHaveBeenCalledTimes(2);
-			expect(player.seekTo).toHaveBeenLastCalledWith(7345);
+			expect(player.seekTo).toHaveBeenLastCalledWith(12345);
 		});
 
 		it("Highlights the current entry and updates the time display as the player is ticking", async () => {
-			player.getCurrentTime = vi.fn();
-
 			arrange([
 				{ timeMs: 0 },
 				{ timeMs: 1000 },
@@ -272,8 +288,6 @@ describe("Entries", () => {
 		});
 
 		it("Adds a new entry correctly", async () => {
-			player.getCurrentTime = vi.fn();
-
 			const initialEntries = [
 				{ timeMs: 0 },
 				{ timeMs: 1000 },
@@ -455,12 +469,9 @@ describe("Entries", () => {
 		});
 
 		it("Fills in new count if previous two entries have counts", async () => {
-			// const { entriesAtom } = getAtoms(platform);
-			// setAtoms([[entriesAtom, [{ timeMs: 0 }, { timeMs: 1000, count: 4 }]]]);
-
-			(player.getCurrentTime as Mock).mockReturnValue(Promise.resolve(1495));
-
 			arrange([{ timeMs: 0 }, { timeMs: 1000, count: 4 }]);
+
+			await tickToTime(1495);
 
 			await user.click(screen.getByRole("button", { name: "Add Entry" }));
 
@@ -505,15 +516,15 @@ describe("Entries", () => {
 
 			expect(player.pause).not.toHaveBeenCalled();
 
-			act(unmount);
+			await act(async () => unmount());
 
 			expect(player.pause).toHaveBeenCalledOnce();
 		});
 
-		it("Preserves the existing entries when remounted", () => {
+		it("Preserves the existing entries when remounted", async () => {
 			const { unmount } = arrange([{ timeMs: 0, count: 1 }]);
 
-			unmount();
+			await act(async () => unmount());
 
 			arrange(false);
 
@@ -525,6 +536,8 @@ describe("Entries", () => {
 					isCurrent: false,
 				},
 			]);
+
+			(player.pause as Mock<typeof pauseImpl>).mockResolvedValueOnce();
 		});
 	});
 });
