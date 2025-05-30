@@ -95,15 +95,12 @@ const makeWritableAtomFromReader = <T>(
 };
 
 // Creates writable atoms for testing purposes
-const makeDerivedAtomWritable = <T>(
-	derivedReadOnlyAtom: Atom<T>,
-	initial: T,
-) => {
+const makeDerivedAtomWritable = <T>(srcReadOnlyAtom: Atom<T>, initial: T) => {
 	const flagAtom = atom(false);
 	const altSourceAtom = atom<T>(initial);
 
 	const read = (get: Getter) =>
-		get(flagAtom) ? get(altSourceAtom) : get(derivedReadOnlyAtom);
+		get(flagAtom) ? get(altSourceAtom) : get(srcReadOnlyAtom);
 
 	const write = (_: Getter, set: Setter, newValue: T) => {
 		set(flagAtom, true);
