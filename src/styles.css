@@ -24,10 +24,16 @@ button,
 }
 
 /* Focus styling */
-
 input,
 button,
-[role="menuitem"],
-[role="dialog"] {
-	@apply outline-2 outline-offset-2 outline-transparent focus-visible:outline-cyan-500 dark:focus-visible:outline-orange-400;
+[role="menuitem"] {
+	@apply outline-2 outline-offset-2 outline-transparent data-[focus-visible]:outline-cyan-500 dark:data-[focus-visible]:outline-orange-400;
+}
+
+/* 
+ * React Aria provides no styling. Required for correct styling of modals.
+ * See https://react-spectrum.adobe.com/react-aria/Modal.html#modaloverlay
+ */
+.react-aria-ModalOverlay {
+	@apply fixed inset-0 flex items-center justify-center bg-black/75;
 }
