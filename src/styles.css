@@ -1,35 +1,33 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root,
+body {
+	@apply h-full bg-zinc-50 font-sans text-zinc-800 dark:bg-zinc-800 dark:text-zinc-50;
+}
+
 #root {
 	@apply flex h-full flex-col;
 }
 
-@layer base {
-	:root,
-	body {
-		@apply h-full bg-zinc-50 font-sans text-zinc-800 dark:bg-zinc-800 dark:text-zinc-50;
-	}
+a {
+	@apply text-violet-800 underline dark:text-violet-400;
+}
 
-	a {
-		@apply text-violet-800 underline dark:text-violet-400;
-	}
+input {
+	@apply bg-zinc-100 dark:bg-gray-700;
+}
 
-	button,
-	[role="button"],
-	[role="menuitem"] {
-		@apply cursor-pointer disabled:cursor-not-allowed;
-	}
+button,
+[role="menuitem"] {
+	@apply cursor-pointer disabled:cursor-not-allowed;
+}
 
-	/* Focus styling */
+/* Focus styling */
 
-	input {
-		@apply bg-zinc-50 outline-1 outline-none focus-visible:outline-cyan-700 dark:bg-gray-700 dark:focus-visible:outline-orange-400;
-	}
-
-	button,
-	[role="menuitem"],
-	[role="dialog"] {
-		@apply outline-none data-[focus-visible]:outline-blue-700 dark:data-[focus-visible]:outline-orange-400;
-	}
+input,
+button,
+[role="menuitem"],
+[role="dialog"] {
+	@apply outline-2 outline-offset-2 outline-transparent focus-visible:outline-cyan-500 dark:focus-visible:outline-orange-400;
 }
