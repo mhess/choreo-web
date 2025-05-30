@@ -9,7 +9,7 @@ import { platformAtom, playerAtom, trackNameAtom } from "~/lib/platformAtoms";
 import { useColorScheme, useIsMobile } from "~/lib/utils";
 import { audioFileAtom } from "~/platforms/audioFile";
 import { spotifyAuthAtom } from "~/platforms/spotify";
-import { videoIdAtom } from "~/platforms/youtube";
+import { resetVideoAtom } from "~/platforms/youtube";
 import { menuStyles } from "~/styles";
 
 import PlatformItems from "./PlatformItems";
@@ -22,7 +22,7 @@ export default function MenuDropdown() {
 	const [, saveToCSV] = useAtom(saveToCSVAtom);
 	const [, loadFromCSV] = useAtom(loadFromCSVAtom);
 
-	const [ytVideoId, setYtVideoId] = useAtom(videoIdAtom);
+	const [, resetYtVideo] = useAtom(resetVideoAtom);
 	const [isSpotifyLoggedIn, logoutSpotify] = useAtom(spotifyAuthAtom);
 	const [, setAudioFile] = useAtom(audioFileAtom);
 
@@ -60,8 +60,8 @@ export default function MenuDropdown() {
 
 	const platformGroup = isMobile && <PlatformItems key="platform" />;
 
-	const youTubeGroup = ytVideoId && platform === "youtube" && (
-		<MenuItem key="change-yt" onAction={() => setYtVideoId(null)}>
+	const youTubeGroup = player && platform === "youtube" && (
+		<MenuItem key="change-yt" onAction={resetYtVideo}>
 			Change YouTube Video
 		</MenuItem>
 	);

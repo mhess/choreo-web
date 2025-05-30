@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { type PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, useEffect, useState } from "react";
 import { Button } from "react-aria-components";
 
 import Loading from "~/components/Loading";
@@ -7,62 +7,59 @@ import { actionBtnStyles } from "~/styles";
 
 import {
 	YouTubePlayerStatus,
-	extractVideoIdFromUrl,
+	extractVideoId,
 	useYouTubePlayer,
 } from "./internals";
 
-export default function YouTubeEditor({ children }: PropsWithChildren) {
-	const { status, setStatus, setVideoId } = useYouTubePlayer();
-
-	const handleRetry = () => {
-		setVideoId(null);
-		setStatus(YouTubePlayerStatus.LOADED);
-	};
+export default function YouTubeLanding({ children }: PropsWithChildren) {
+	const { status, cueVideo } = useYouTubePlayer();
+	const formInput = useState("");
 
 	switch (status) {
 		case YouTubePlayerStatus.LOADING:
 			return <Loading message="Loading YouTube player" />;
 		case YouTubePlayerStatus.BAD_ID:
-			return (
-				<div className="mt-8 text-center">
-					<p>Cannot use that video ID.</p>
-					<Button
-						className="text-violet-700 underline dark:text-violet-500"
-						onPress={handleRetry}
-					>
-						Try a different one?
-					</Button>
-				</div>
-			);
 		case YouTubePlayerStatus.LOADED:
-			return <UrlForm setVideoId={setVideoId} />;
+			return (
+				<UrlForm
+					inputState={formInput}
+					cueVideo={cueVideo}
+					wasBadId={status === YouTubePlayerStatus.BAD_ID}
+				/>
+			);
 		case YouTubePlayerStatus.BUFFERING:
 			return <Loading message="Waiting for video to load" />;
 		case YouTubePlayerStatus.READY:
 			return children;
 		default:
-			return <p className="mt-8 text-center">Oops! Something went wrong!</p>;
+			throw "Invalid YouTube Status";
 	}
 }
 
-const UrlForm = ({ setVideoId }: { setVideoId: (id: string) => void }) => {
-	const [input, setInput] = useState("");
+interface UrlFormProps {
+	inputState: [string, (s: string) => void];
+	cueVideo: (id: string) => void;
+	wasBadId: boolean;
+}
+
+const UrlForm = ({ cueVideo, wasBadId, inputState }: UrlFormProps) => {
+	const [input, setInput] = inputState;
 	const [error, setError] = useState(false);
 
-	const handleLoadUrl = () => {
-		const videoId = extractVideoIdFromUrl(input);
-		if (!videoId) setError(true);
-		else setVideoId(videoId);
-	};
+	useEffect(() => {
+		setError(!!wasBadId);
+	}, [wasBadId]);
 
-	const handleLoadId = () => {
-		setVideoId(input);
+	const handleLoadVideo = () => {
+		const videoId = extractVideoId(input);
+		if (videoId) cueVideo(videoId);
+		else setError(true);
 	};
 
 	return (
 		<div className="flex w-full justify-center overflow-hidden">
-			<div className="mx-4 mt-8 mb-4 flex max-w-sm flex-1 flex-col items-center gap-4">
-				<p>Please enter or paste in a YouTube video URL or ID</p>
+			<div className="mx-4 mt-8 mb-4 flex max-w-sm flex-1 flex-col items-center gap-4 text-center">
+				<p>Please enter a YouTube video URL or ID</p>
 				<div className="flex w-full flex-col gap-2">
 					<input
 						value={input}
@@ -78,30 +75,18 @@ const UrlForm = ({ setVideoId }: { setVideoId: (id: string) => void }) => {
 						}}
 					/>
 					{
-						<p
-							className={clsx(
-								"text-center text-xs text-red-500",
-								!error && "opacity-0",
-							)}
-						>
+						<p className={clsx("text-xs text-red-500", !error && "opacity-0")}>
 							Not a valid YouTube URL or ID
 						</p>
 					}
 				</div>
 				<div className="flex items-center gap-4">
 					<Button
-						isDisabled={!input.length}
+						isDisabled={!input.length || error}
 						className={actionBtnStyles}
-						onPress={handleLoadUrl}
+						onPress={handleLoadVideo}
 					>
-						Load URL
-					</Button>
-					<Button
-						isDisabled={!input.length}
-						className={actionBtnStyles}
-						onPress={handleLoadId}
-					>
-						Load video ID
+						Load Video
 					</Button>
 				</div>
 			</div>

@@ -1,5 +1,4 @@
 import { type PrimitiveAtom, atom, useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 import { useEffect } from "react";
 
 import { PlatformPlayer, getPlatformAtoms } from "~/lib/player";
@@ -12,10 +11,6 @@ declare global {
 	}
 }
 
-type YTPlayerWithVideoData = YT.Player & {
-	getVideoData: () => { author: string; title: string };
-};
-
 export enum YouTubePlayerStatus {
 	LOADING = "Player has not loaded yet",
 	LOADED = "Player has loaded",
@@ -24,8 +19,6 @@ export enum YouTubePlayerStatus {
 	ERROR = "There was an error",
 	READY = "Ready",
 }
-
-export const videoIdAtom = atomWithStorage<string | null>("yt-video-url", null);
 
 // https://developers.google.com/youtube/iframe_api_reference#Events
 const BAD_ID_ERR_CODES = new Set([2, 100, 101, 150]);
@@ -36,6 +29,12 @@ const pausedAtom = atom(true);
 const writePausedAtom = atom(null, (_, set, paused: boolean) =>
 	set(pausedAtom, paused),
 );
+
+const YT_KEY_LS_KEY = "yt-video-id";
+export const resetVideoAtom = atom(null, (_, set) => {
+	set(statusAtom, YouTubePlayerStatus.LOADED);
+	localStorage.removeItem(YT_KEY_LS_KEY);
+});
 
 const videoDataAtom = atom((get) => {
 	const player = get(playerAtom);
@@ -79,13 +78,7 @@ const getYouTubePlayer = async (
 				playerVars: { playsinline: 1 },
 				events: {
 					onReady: () =>
-						resolve(
-							new YouTubePlayer(
-								player as YTPlayerWithVideoData,
-								setPaused,
-								setStatus,
-							),
-						),
+						resolve(new YouTubePlayer(player, setPaused, setStatus)),
 					onError: (e) => {
 						if (BAD_ID_ERR_CODES.has(e.data)) {
 							setStatus(YouTubePlayerStatus.BAD_ID);
@@ -100,10 +93,10 @@ const getYouTubePlayer = async (
 };
 
 class YouTubePlayer extends PlatformPlayer {
-	ytPlayer: YTPlayerWithVideoData;
+	ytPlayer: YT.Player;
 
 	constructor(
-		ytPlayer: YTPlayerWithVideoData,
+		ytPlayer: YT.Player,
 		setPaused: (paused: boolean) => void,
 		setStatus: (status: YouTubePlayerStatus) => void,
 	) {
@@ -116,6 +109,7 @@ class YouTubePlayer extends PlatformPlayer {
 			setPaused(isPaused);
 
 			if (state === YT.PlayerState.CUED) {
+				localStorage.setItem(YT_KEY_LS_KEY, ytPlayer.getVideoData().video_id);
 				setStatus(YouTubePlayerStatus.READY);
 			}
 
@@ -146,30 +140,30 @@ class YouTubePlayer extends PlatformPlayer {
 type YouTubePlayerType = InstanceType<typeof YouTubePlayer>;
 export type { YouTubePlayerType as YouTubePlayer };
 
-export const extractVideoIdFromUrl = (urlString: string) => {
+export const extractVideoId = (input: string) => {
+	let url;
 	try {
-		const url = new URL(urlString);
-
-		if (url.hostname === "www.youtube.com" && url.pathname === "/watch") {
-			const params = new URLSearchParams(url.search);
-			return params.get("v");
-		}
-
-		if (url.hostname === "youtu.be" && url.pathname.length > 1) {
-			return url.pathname.slice(1);
-		}
-
-		return null;
+		url = new URL(input);
 	} catch {
-		return null;
+		return input;
 	}
+
+	if (url.hostname === "www.youtube.com" && url.pathname === "/watch") {
+		const params = new URLSearchParams(url.search);
+		return params.get("v");
+	}
+
+	if (url.hostname === "youtu.be" && url.pathname.length > 1) {
+		return url.pathname.slice(1);
+	}
+
+	return null;
 };
 
 export const useYouTubePlayer = () => {
 	const [player, setPlayer] = useAtom(playerAtom);
 	const [status, setStatus] = useAtom(statusAtom);
 	const [, setPaused] = useAtom(writePausedAtom);
-	const [videoId, setVideoId] = useAtom(videoIdAtom);
 
 	useEffect(() => {
 		if (!window.ytPlayerPromise)
@@ -178,11 +172,21 @@ export const useYouTubePlayer = () => {
 	}, [setPlayer, setPaused, setStatus]);
 
 	useEffect(() => {
-		if (videoId && player) {
-			setStatus(YouTubePlayerStatus.BUFFERING);
-			player.ytPlayer.cueVideoById(videoId);
-		} else setStatus(YouTubePlayerStatus[player ? "LOADED" : "LOADING"]);
-	}, [player, videoId, setStatus]);
+		if (player) {
+			const savedVideoId = localStorage.getItem(YT_KEY_LS_KEY);
 
-	return { status, setStatus, setVideoId };
+			if (savedVideoId) {
+				if (status !== YouTubePlayerStatus.READY) cueVideo(savedVideoId);
+			} else setStatus(YouTubePlayerStatus.LOADED);
+		} else {
+			setStatus(YouTubePlayerStatus.LOADING);
+		}
+	}, [player]);
+
+	const cueVideo = (videoId: string) => {
+		setStatus(YouTubePlayerStatus.BUFFERING);
+		player?.ytPlayer.cueVideoById(videoId);
+	};
+
+	return { status, cueVideo };
 };

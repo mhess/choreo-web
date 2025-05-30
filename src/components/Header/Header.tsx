@@ -14,7 +14,6 @@ import {
 } from "~/lib/platformAtoms";
 import { useColorScheme, useIsMobile } from "~/lib/utils";
 import { spotifyAuthAtom } from "~/platforms/spotify";
-import { videoIdAtom } from "~/platforms/youtube";
 import { ctlBarStyles, menuBtnStyles } from "~/styles";
 
 import Hamburger from "./Hamburger";
@@ -23,16 +22,12 @@ import SelectPlatformButton from "./SelectPlatformButton";
 
 export default function Header() {
 	const [platform, setPlatform] = useAtom(platformAtom);
-	const [ytVideoId] = useAtom(videoIdAtom);
 	const [isLoggedIn] = useAtom(spotifyAuthAtom);
 	const [player] = useAtom(playerAtom);
 	const isMobile = useIsMobile();
 
 	const isSpotify = platform === "spotify";
-	const shouldShowActions =
-		player ||
-		(isLoggedIn && isSpotify) ||
-		(platform === "youtube" && !!ytVideoId);
+	const shouldShowActions = player || (isLoggedIn && isSpotify);
 
 	return (
 		<header className={`${ctlBarStyles} flex items-center border-b px-4 py-1`}>
