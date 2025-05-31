@@ -51,7 +51,7 @@ export default function Header() {
 						{isSpotify && <SpotifyChangeButton />}
 						{!isMobile && (
 							<MenuTrigger>
-								<Button className={`${menuBtnStyles} px-2 py-1 text-sm`}>
+								<Button className={`${menuBtnStyles} ml-1 px-2 py-1 text-sm`}>
 									Actions
 									<IconChevronDown size="1.25rem" className="translate-y-0.5" />
 								</Button>
