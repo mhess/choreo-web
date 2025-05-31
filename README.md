@@ -1,11 +1,39 @@
 # CHOREO
 
-The **Choreo** web app allows you to annote time points in audio tracks and use those annotations to seek through the track.
+Annote time points in an audio track and use those annotations to seek through
+the track.
 
-The idea was born out of the frustrating experience of trying to compose a dance choreography using the UI from typical music streaming services.
+The idea was born out of the frustrating experience trying to compose a dance
+choreography using the UI from typical music streaming services.
 
-The app can consume audio from a Spotify premium account, YouTube, or a local audio file on disk.
+The app can consume audio from a Spotify premium account, a YouTube video, or a
+local audio file on disk.
 
 Check out the live demo at https://choreo-web.vercel.app.
 
-Currently architected for deployment on Vercel. The app is a client-side rendered single-page web app, but has a server-side edge function required for Spotify authentication. If you want to use/test the edge function integration in development, you must install the vercel CLI and run the `vercel dev` command.
+## FEATURES
+
+- Manually mark specific timestamps (entries) for an audio track via button
+  press during audio playback.
+- Annotate entries with notes and/or meter counts.
+- Easily seek through an audio track using the timestamps of recorded entries.
+- Highlighting of most recent entry to current time of audio playback.
+- Automatic meter/count generation based on intervals between existing entries.
+- Save entries to a CSV file.
+- Load entries from a CSV file.
+
+## ARCHITECTURE
+
+Choreo is a client-side-rendered, single-page web app built with
+
+- [Typescript](https://www.typescriptlang.org/) for type-safe javascript
+- [React](https://react.dev/) for dynamic HTML rendering
+- [Jotai](https://jotai.org/) for state management
+- [React Aria Components](https://react-spectrum.adobe.com/react-aria/components.html)
+  for accessible interaction
+- [TailwindCSS](https://tailwindcss.com/) for styling
+- [Papa Parse](https://www.papaparse.com/) for CSV genreation and parsing
+
+Although the app is a client-side-rendered SPA, server-side logic is required
+for Spotify authentication. This is implemented with a "serverless" edge
+function for the live demo that is served by [Vercel](https://vercel.com/).
