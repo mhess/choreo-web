@@ -1,4 +1,4 @@
-import { act, render, screen, within } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { UserEvent } from "@testing-library/user-event";
 import type { Atom } from "jotai";
@@ -96,7 +96,7 @@ describe("Entry", () => {
 
 		expect(screen.getByRole("row")).not.toHaveClass(highlightClass);
 
-		await act(() => setAtoms([[entry.isCurrentAtom, true]]));
+		await act(async () => setAtoms([[entry.isCurrentAtom, true]]));
 
 		expect(screen.getByRole("row")).toHaveClass(highlightClass);
 	});
@@ -113,7 +113,7 @@ describe("Entry", () => {
 		expect(getEntryValues()).toEqual([
 			{
 				count: 10,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "Note",
 				timeMs: 12340,
@@ -147,7 +147,7 @@ describe("Entry", () => {
 		expect(getEntryValues()).toEqual([
 			{
 				count: 5,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "New note",
 				timeMs: 12340,
@@ -170,28 +170,28 @@ describe("Entry", () => {
 		expect(getEntryValues()).toEqual([
 			{
 				count: 0,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "",
 				timeMs: 0,
 			},
 			{
 				count: 5,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "Note",
 				timeMs: 12340,
 			},
 			{
 				count: 0,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "",
 				timeMs: 23450,
 			},
 			{
 				count: 0,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "",
 				timeMs: 30000,
@@ -203,21 +203,21 @@ describe("Entry", () => {
 		expect(getEntryValues()).toEqual([
 			{
 				count: 0,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "",
 				timeMs: 0,
 			},
 			{
 				count: 0,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "",
 				timeMs: 23450,
 			},
 			{
 				count: 0,
-				countFill: false,
+				canFill: false,
 				isCurrent: false,
 				note: "",
 				timeMs: 30000,
@@ -225,96 +225,178 @@ describe("Entry", () => {
 		]);
 	});
 
-	it("Renders count fill button when the count for current and previous entry are filled", async () => {
-		arrange(
-			[{ timeMs: 0, count: 1 }, { timeMs: 995, count: 0 }, { timeMs: 2020 }],
-			1,
-		);
-
-		expect(
+	describe("Count fill behavior", () => {
+		const getFillBtn = () =>
 			screen.queryByRole("button", {
 				name: "Fill in the rest of entry counts",
-			}),
-		).not.toBeInTheDocument();
+			}) as HTMLElement;
 
-		const countInput = screen.getByLabelText("Count");
+		it("Does not render count fill button for first entry", async () => {
+			arrange(
+				[
+					{ timeMs: 0, count: 1 },
+					{ timeMs: 995, count: 0 },
+				],
+				0,
+			);
 
-		await user.clear(countInput);
-		await user.type(countInput, "2");
+			expect(getFillBtn()).not.toBeInTheDocument();
 
-		await user.click(
-			screen.getByRole("button", { name: "Fill in the rest of entry counts" }),
-		);
+			const countInput = screen.getByLabelText("Count");
+			await user.click(countInput);
 
-		const getInDialog = async () =>
-			within(await screen.findByRole("dialog", { name: "Fill in the rest?" }));
+			expect(getFillBtn()).not.toBeInTheDocument();
 
-		await user.click((await getInDialog()).getByRole("button", { name: "No" }));
+			await user.clear(countInput);
+			expect(getFillBtn()).not.toBeInTheDocument();
 
-		expect(getEntryValues()).toEqual([
-			{
-				count: 1,
-				note: "",
-				isCurrent: false,
-				countFill: false,
-				timeMs: 0,
-			},
-			{
-				count: 2,
-				note: "",
-				isCurrent: false,
-				countFill: true,
-				timeMs: 995,
-			},
-			{
-				count: 0,
-				note: "",
-				isCurrent: false,
-				countFill: false,
-				timeMs: 2020,
-			},
-		]);
+			await user.type(countInput, "1");
+			expect(getFillBtn()).not.toBeInTheDocument();
+		});
 
-		await user.click(
-			screen.getByRole("button", { name: "Fill in the rest of entry counts" }),
-		);
+		it("Does not render count fill button for last entry", async () => {
+			arrange(
+				[
+					{ timeMs: 0, count: 1 },
+					{ timeMs: 995, count: 0 },
+				],
+				1,
+			);
 
-		const inDialog = await getInDialog();
-		expect(
-			inDialog.getByText(
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			const countInput = screen.getByLabelText("Count");
+			await user.click(countInput);
+
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			await user.clear(countInput);
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			await user.type(countInput, "1");
+			expect(getFillBtn()).not.toBeInTheDocument();
+		});
+
+		it("Correctly renders fill count button in middle entries and can fill", async () => {
+			arrange(
+				[
+					{ timeMs: 0, count: 1 },
+					{ timeMs: 995, count: 0 },
+					{ timeMs: 2005, count: 0 },
+				],
+				1,
+			);
+
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			const countInput = screen.getByLabelText("Count");
+			expect(countInput).toHaveValue("0");
+
+			await user.click(countInput);
+
+			// No fill button when input has not been modified
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			await user.clear(countInput);
+
+			// No fill button when input is empty
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			await user.type(countInput, "2");
+
+			// Fill button appears when counts don't align
+			expect(getFillBtn()).toBeInTheDocument();
+
+			await user.click(getFillBtn());
+
+			expect(
+				screen.getByRole("dialog", { name: "Fill in the rest?" }),
+			).toHaveTextContent(
 				"Do you want to use the count of this entry and the previous entry to fill in the rest of the counts?",
-			),
-		).toBeInTheDocument();
-		await user.click(inDialog.getByRole("button", { name: "Yes" }));
+			);
 
-		expect(
-			screen.queryByRole("button", {
-				name: "Fill in the rest of entry counts",
-			}),
-		).not.toBeInTheDocument();
+			await user.click(screen.getByRole("button", { name: "No" }));
 
-		expect(getEntryValues()).toEqual([
-			{
-				count: 1,
-				note: "",
-				countFill: false,
-				isCurrent: false,
-				timeMs: 0,
-			},
-			{
-				count: 2,
-				note: "",
-				countFill: false,
-				isCurrent: false,
-				timeMs: 995,
-			},
-			{
-				count: 3,
-				note: "",
-				countFill: false,
-				isCurrent: false,
-				timeMs: 2020,
-			},
-		]);
+			expect(
+				screen.queryByRole("dialog", { name: "Fill in the rest?" }),
+			).not.toBeInTheDocument();
+
+			expect(getEntryValues()).toEqual([
+				{
+					count: 1,
+					canFill: false,
+					isCurrent: false,
+					note: "",
+					timeMs: 0,
+				},
+				{
+					count: 2,
+					canFill: true,
+					isCurrent: false,
+					note: "",
+					timeMs: 995,
+				},
+				{
+					count: 0,
+					canFill: false,
+					isCurrent: false,
+					note: "",
+					timeMs: 2005,
+				},
+			]);
+
+			await user.click(countInput);
+
+			await user.click(getFillBtn());
+
+			await user.click(screen.getByRole("button", { name: "Yes" }));
+
+			expect(
+				screen.queryByRole("dialog", { name: "Fill in the rest?" }),
+			).not.toBeInTheDocument();
+
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			expect(getEntryValues()).toEqual([
+				{
+					count: 1,
+					canFill: false,
+					isCurrent: false,
+					note: "",
+					timeMs: 0,
+				},
+				{
+					count: 2,
+					canFill: false,
+					isCurrent: false,
+					note: "",
+					timeMs: 995,
+				},
+				{
+					count: 3,
+					canFill: false,
+					isCurrent: false,
+					note: "",
+					timeMs: 2005,
+				},
+			]);
+
+			await user.click(countInput);
+
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			await user.clear(countInput);
+
+			expect(getFillBtn()).not.toBeInTheDocument();
+
+			await user.type(countInput, "5");
+
+			expect(getFillBtn()).toBeInTheDocument();
+
+			await user.clear(countInput);
+			await user.type(countInput, "2");
+
+			expect(getFillBtn()).not.toBeInTheDocument();
+		});
 	});
 });

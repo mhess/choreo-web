@@ -1,22 +1,16 @@
-import { IconArrowMoveDown, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import { clsx } from "clsx";
 import { useAtom } from "jotai";
-import {
-	Button,
-	Dialog,
-	DialogTrigger,
-	Heading,
-	Modal,
-} from "react-aria-components";
+import { Button } from "react-aria-components";
 
 import InputWithAtom from "~/components/TextInputWithAtom";
-import Tooltip, { tooltipStyles } from "~/components/Tooltip";
 import { type AtomicEntry, entryAtomsForPlatformAtom } from "~/lib/entries";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { displayMs } from "~/lib/utils";
-import { actionBtnStyles, columnWidthStyles } from "~/styles";
+import { columnWidthStyles } from "~/styles";
 
-import { COUNT_LABEL, NOTE_LABEL } from "./shared";
+import Count from "./Count";
+import { NOTE_LABEL } from "./shared";
 
 export default function Entry(props: { entry: AtomicEntry; index: number }) {
 	const { entry, index } = props;
@@ -26,8 +20,13 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 	const [{ removeAtom }] = useAtom(entryAtomsForPlatformAtom);
 	const [, removeEntry] = useAtom(removeAtom);
 
-	const { timeMs, countAtom, noteAtom, isCurrentAtom, countFillAtom } = entry;
-	const [canFill, fillRest] = useAtom(countFillAtom);
+	const {
+		timeMs,
+		countAtom,
+		noteAtom,
+		isCurrentAtom,
+		canFillAtom: countFillAtom,
+	} = entry;
 	const [isCurrent] = useAtom(isCurrentAtom);
 
 	const displayTime = displayMs(timeMs);
@@ -35,17 +34,14 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 	return (
 		<div
 			role="row"
-			className={`flex items-center pr-2 pl-4 ${isCurrent ? "bg-orange-300 dark:bg-yellow-700" : "bg-zinc-300 odd:bg-zinc-400 dark:bg-zinc-800 dark:odd:bg-zinc-900"}`}
+			className={clsx(
+				"flex items-center pr-2 pl-4",
+				isCurrent
+					? "bg-orange-300 dark:bg-yellow-700"
+					: "bg-zinc-300 odd:bg-zinc-400 dark:bg-zinc-800 dark:odd:bg-zinc-900",
+			)}
 		>
-			<div>
-				{canFill && <FillRest action={fillRest} />}
-				<InputWithAtom
-					className={`${columnWidthStyles.count} rounded px-2 py-0.5 text-right`}
-					aria-label={COUNT_LABEL}
-					type="number"
-					atom={countAtom}
-				/>
-			</div>
+			<Count countAtom={countAtom} canFillAtom={countFillAtom} index={index} />
 			<Button
 				aria-label={`Seek to ${displayTime}`}
 				className={`${columnWidthStyles.timestamp} px-4 py-2 text-right hover:text-blue-400`}
@@ -53,6 +49,7 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 			>
 				{displayTime}
 			</Button>
+			{/* TODO: in-line this component and delete the importing file */}
 			<InputWithAtom
 				className="mr-2 min-w-0 flex-1 rounded px-2 py-0.5"
 				aria-label={NOTE_LABEL}
@@ -72,61 +69,3 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 		</div>
 	);
 }
-
-const FillRest = ({ action }: { action: () => void }) => {
-	const handlePressFillRest = (closeModal: () => void) => () => {
-		action();
-		closeModal();
-	};
-
-	return (
-		<DialogTrigger>
-			<Tooltip
-				tooltip="Use the timing of this and the previous entry to fill in counts
-								for the remaining entries."
-				offset={12}
-				className={`${tooltipStyles} max-w-[19.25rem]`}
-			>
-				<div className="relative">
-					<Button
-						className="absolute top-0.5 text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
-						aria-label="Fill in the rest of entry counts"
-					>
-						<IconArrowMoveDown style={{ width: "18px" }} viewBox="2 4 20 16" />
-					</Button>
-				</div>
-			</Tooltip>
-			<Modal>
-				<Dialog className="max-w-lg overflow-auto rounded-md bg-zinc-100 p-8 outline-none dark:bg-zinc-700">
-					{({ close }) => (
-						<div>
-							<Heading slot="title" className="mb-4 text-xl">
-								Fill in the rest?
-							</Heading>
-							<div className="flex flex-col gap-4">
-								<p>
-									Do you want to use the count of this entry and the previous
-									entry to fill in the rest of the counts?
-								</p>
-								<div className="flex justify-end gap-4">
-									<Button
-										className={actionBtnStyles}
-										onPress={handlePressFillRest(close)}
-									>
-										Yes
-									</Button>
-									<Button
-										className="rounded border border-zinc-600 px-4 py-2 hover:backdrop-brightness-95 dark:hover:backdrop-brightness-110"
-										onPress={close}
-									>
-										No
-									</Button>
-								</div>
-							</div>
-						</div>
-					)}
-				</Dialog>
-			</Modal>
-		</DialogTrigger>
-	);
-};

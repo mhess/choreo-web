@@ -11,14 +11,12 @@ export type Entry = {
 	note: string;
 };
 
-type CountFillAtom = WritableAtom<boolean, [boolean?], void>;
-
 export type AtomicEntry = {
-	countAtom: WritableAtom<number, [number, boolean?], void>;
+	countAtom: WritableAtom<number, [number, number, boolean?], void>;
 	timeMs: number;
 	noteAtom: PrimitiveAtom<string>;
 	isCurrentAtom: PrimitiveAtom<boolean>;
-	countFillAtom: CountFillAtom;
+	canFillAtom: PrimitiveAtom<boolean>;
 };
 
 type PlatformEntryAtoms = {
@@ -27,6 +25,7 @@ type PlatformEntryAtoms = {
 	addAtom: WritableAtom<null, [number], void>;
 	removeAtom: WritableAtom<null, [number], void>;
 	clearAtom: WritableAtom<null, [], void>;
+	fillCountsAtom: WritableAtom<null, [number], void>;
 	currentIndexAtom: WritableAtom<null, [number], void>;
 	saveToCSVAtom: WritableAtom<null, [string], void>;
 	loadFromCSVAtom: WritableAtom<null, [File], Promise<void>>;
@@ -63,7 +62,6 @@ declare global {
 		atoms: Record<
 			Platform,
 			{
-				currentCountFillAtomAtom: PrimitiveAtom<CountFillAtom>;
 				currentIsCurrentAtomAtom: PrimitiveAtom<PrimitiveAtom<boolean>>;
 			}
 		>;
@@ -73,22 +71,15 @@ declare global {
 window.atoms = {} as Window["atoms"];
 
 const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
-	const currentCountFillAtomAtom = atom(atom(false) as CountFillAtom);
 	const currentIsCurrentAtomAtom = atom(atom(false) as PrimitiveAtom<boolean>);
 
 	// For debugging. Since these atoms are never passed to the useAtom() hook,
 	// the only way to see their values is to put them on the window.
-	window.atoms[platform] = {
-		currentCountFillAtomAtom,
-		currentIsCurrentAtomAtom,
-	};
+	window.atoms[platform] = { currentIsCurrentAtomAtom };
 
 	const entriesSrcAtom = atom<AtomicEntry[]>([]);
 
-	const makeAtomicEntry = getAtomicEntryMaker(
-		entriesSrcAtom,
-		currentCountFillAtomAtom,
-	);
+	const makeAtomicEntry = getAtomicEntryMaker(entriesSrcAtom);
 
 	const entriesAtom = atom(
 		(get) => get(entriesSrcAtom),
@@ -99,7 +90,6 @@ const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
 
 			const newEntries = newInputs.map(makeAtomicEntry);
 			set(entriesSrcAtom, newEntries);
-			set(currentCountFillAtomAtom, newEntries[0].countFillAtom);
 		},
 	);
 
@@ -115,15 +105,12 @@ const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
 
 		for (const entry of entries) set(entry.isCurrentAtom, false);
 		const count = guessCountForIndex(get, entries, index, timeMs);
-		const newEntry: AtomicEntry = makeAtomicEntry(
-			{
-				count,
-				timeMs,
-				note: "",
-				isCurrent: true,
-			},
-			index,
-		);
+		const newEntry: AtomicEntry = makeAtomicEntry({
+			count,
+			timeMs,
+			note: "",
+			isCurrent: true,
+		});
 
 		const newEntries = [
 			...entries.slice(0, index),
@@ -135,10 +122,8 @@ const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
 	});
 
 	const removeAtom = atom(null, (get: Getter, set: Setter, index: number) => {
-		const entries = get(entriesAtom);
-
 		if (!index) return;
-		const newEntries = [...entries];
+		const newEntries = [...get(entriesAtom)];
 		newEntries.splice(index, 1);
 		set(entriesSrcAtom, newEntries);
 	});
@@ -147,6 +132,21 @@ const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
 		set(entriesAtom);
 	});
 
+	const fillCountsAtom = atom(null, (get, set, index: number) => {
+		const entries = get(entriesAtom);
+
+		set(entries[index].canFillAtom, false);
+
+		for (let i = index + 1; i < entries.length; i++) {
+			const entry = entries[i];
+			const count = guessCountForIndex(get, entries, i, entry.timeMs);
+			set(entry.countAtom, count, i, true);
+			set(entry.canFillAtom, false);
+		}
+	});
+
+	// TODO: change to `setHighlightIndexAtom` or something else that has a verb
+	//			 as the first word
 	const currentIndexAtom = atom(
 		null,
 		(get: Getter, set: Setter, timeMs: number) => {
@@ -186,6 +186,7 @@ const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
 		addAtom,
 		removeAtom,
 		clearAtom,
+		fillCountsAtom,
 		currentIndexAtom,
 		saveToCSVAtom,
 		loadFromCSVAtom,
@@ -198,39 +199,18 @@ export type EntryInput = Partial<Omit<Entry, "timeMs">> & {
 };
 
 const getAtomicEntryMaker =
-	(
-		entriesAtom: Atom<AtomicEntry[]>,
-		currentCountFillAtomAtom: PrimitiveAtom<CountFillAtom>,
-	) =>
-	(entry: EntryInput, index: number): AtomicEntry => {
+	(entriesAtom: Atom<AtomicEntry[]>) =>
+	(entry: EntryInput): AtomicEntry => {
+		const canFillAtom = atom(false);
+
 		const countSrcAtom = atom(entry.count || 0);
 		const countAtom = atom(
 			(get) => get(countSrcAtom),
-			(get, set, count: number, isFill?: boolean) => {
+			(get, set, count: number, index: number, isFill = false) => {
 				set(countSrcAtom, count);
-				if (isFill) return;
 
-				if (getDoCountsAlign(get, entriesAtom, index)) return;
-
-				set(get(currentCountFillAtomAtom), false);
-				set(countFillAtom, true);
-				set(currentCountFillAtomAtom, countFillAtom);
-			},
-		);
-
-		const countFillSrcAtom = atom(false);
-		const countFillAtom: CountFillAtom = atom(
-			(get) => get(countFillSrcAtom),
-			(get, set, canFill?: boolean) => {
-				if (canFill !== undefined) return set(countFillSrcAtom, canFill);
-
-				set(countFillSrcAtom, false);
-				const entries = get(entriesAtom);
-
-				for (let i = index + 1; i < entries.length; i++) {
-					const entry = entries[i];
-					const count = guessCountForIndex(get, entries, i, entry.timeMs);
-					set(entry.countAtom, count, true);
+				if (!isFill) {
+					set(canFillAtom, !getDoCountsAlign(get, entriesAtom, index));
 				}
 			},
 		);
@@ -240,7 +220,7 @@ const getAtomicEntryMaker =
 			timeMs: entry.timeMs,
 			noteAtom: atom(entry.note || ""),
 			isCurrentAtom: atom(entry.isCurrent || false),
-			countFillAtom,
+			canFillAtom,
 		};
 	};
 
@@ -267,7 +247,8 @@ const getDoCountsAlign = (
 	const nextTimeDelta = nextEntry.timeMs - entry.timeMs;
 	const expectedCountDelta = Math.round(nextTimeDelta / prevCountMs);
 
-	return get(nextEntry.countAtom) - get(entry.countAtom) === expectedCountDelta;
+	const delta = get(nextEntry.countAtom) - get(entry.countAtom);
+	return delta === expectedCountDelta;
 };
 
 const findEntryIndex = (
@@ -335,11 +316,11 @@ const guessCountForIndex = (
 
 type CountAndTime = Pick<AtomicEntry, "countAtom" | "timeMs">;
 
-const getCountMs = <F extends CountAndTime, S extends CountAndTime>(
-	get: Getter,
-	first: F,
-	second: S,
-) => {
+/**
+ * Calculate the milliseconds in each unit of count given by the count
+ * difference between two entries.
+ */
+const getCountMs = (get: Getter, first: CountAndTime, second: CountAndTime) => {
 	const countDelta = get(second.countAtom) - get(first.countAtom);
 	if (countDelta <= 0) return 0;
 	const msDelta = second.timeMs - first.timeMs;
