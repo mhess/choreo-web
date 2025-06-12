@@ -21,17 +21,24 @@ export default function Landing() {
 				isMobile && "items-start pt-4",
 			)}
 		>
-			<div className="m-4 mt-8 flex w-full max-w-3xl flex-col gap-4 text-center">
-				<h3 className="text-4xl font-bold">Welcome to the Choreo&nbsp;App!</h3>
-				<p>Choreo is an app that helps you compose choreography to music.</p>
-				<p>
-					The app can use audio from <b>Youtube,</b> a <b>Spotify</b> premium
-					account, or a <b>local file</b> to set up a web player that allows you
-					to annotate time points in a track while it&apos;s playing. You can
-					use these annotations to navigate around the song easily. The app
-					allows you to save these annotations to CSV files for later.
+			<div className="m-4 mt-8 flex w-full max-w-2xl flex-col gap-8">
+				<h3 className="text-center text-4xl font-bold">
+					Welcome to the Choreo&nbsp;App!
+				</h3>
+				<p className="text-center">
+					Choreo is a web app that helps you compose choreography to music.
 				</p>
-				<div className="mt-8 flex flex-wrap justify-center gap-4">
+				<div className="flex flex-col gap-6 text-center">
+					<p>
+						You can use audio from <b>Youtube,</b> a <b>Spotify</b> premium
+						account, or a <b>local file</b> to set up a web player that allows
+						you to annotate time points in a track while it&apos;s playing.
+					</p>
+					<p>Use these annotations to navigate around the song easily.</p>
+					<p>Save these annotations to CSV files for later.</p>
+					<p>Give it a try!</p>
+				</div>
+				<div className="flex flex-wrap justify-center gap-4">
 					<Button
 						className={`${btnStyles} gap-3`}
 						onPress={() => selectPlatform("youtube")}
