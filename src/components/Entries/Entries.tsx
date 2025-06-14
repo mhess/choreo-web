@@ -41,7 +41,7 @@ export default function Entries() {
 
 	return (
 		<>
-			{isHelpOpen && <EntryHeader />}
+			<EntryHeader />
 			<div
 				role="region"
 				aria-label="Entries"
@@ -51,7 +51,6 @@ export default function Entries() {
 				)}
 				ref={scrollerRef}
 			>
-				{!isHelpOpen && <EntryHeader />}
 				<div ref={containerRef}>
 					{entries.map((entry, index) => (
 						<Entry key={entry.timeMs} entry={entry} index={index} />
