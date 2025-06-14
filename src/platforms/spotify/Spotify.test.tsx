@@ -260,7 +260,7 @@ describe("Spotify", () => {
 
 		expect(tickMock).toHaveBeenCalledTimes(2);
 
-		await act(() => player.seekTo(1000));
+		await act(async () => player.seekTo(1000));
 
 		expect(await player.getCurrentTime()).toEqual(1000);
 
@@ -308,6 +308,7 @@ describe("Spotify", () => {
 				resolve = res;
 			}),
 		);
+
 		render(
 			<SpotifyComponent token={null}>
 				<div data-testid="entries" />

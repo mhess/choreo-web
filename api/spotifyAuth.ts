@@ -38,7 +38,7 @@ const login = (protocolAndHost: string) => {
 		client_id: process.env.SPOTIFY_CLIENT_ID,
 		scope: scope,
 		redirect_uri: `${protocolAndHost}/api/callback`,
-		state: state,
+		state,
 	} as Record<string, string>);
 
 	const redirectUrl = `https://accounts.spotify.com/authorize/?${authParams.toString()}`;
@@ -52,7 +52,7 @@ const login = (protocolAndHost: string) => {
 const callback = async (protocolAndHost: string, url: URL) => {
 	const code = url.searchParams.get("code");
 
-	if (!code) return new Response("No code recieved", { status: 404 });
+	if (!code) return new Response("No code received", { status: 404 });
 
 	const clientId = process.env.SPOTIFY_CLIENT_ID;
 	const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;

@@ -62,9 +62,14 @@ export default function Header() {
 				)}
 			</div>
 			<div className="flex gap-3">
-				{!isMobile && <SelectPlatformButton />}
-				{!isMobile && <ToggleColorScheme />}
-				{isMobile && <BurgerMenu />}
+				{isMobile ? (
+					<BurgerMenu />
+				) : (
+					<>
+						<SelectPlatformButton />
+						<ToggleColorScheme />
+					</>
+				)}
 			</div>
 		</header>
 	);
