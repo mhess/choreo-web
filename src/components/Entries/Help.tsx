@@ -1,5 +1,5 @@
 import { IconCornerLeftUp, IconPlaylistAdd } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { type RefObject, useEffect, useState } from "react";
 
 import { tw, useIsMobile } from "~/lib/utils";
 
@@ -23,8 +23,8 @@ const termStyles = tw`font-bold italic`;
 const defStyles = tw`ml-4`;
 
 interface HelpProps {
-	scrollerRef: ElementRef;
-	containerRef: ElementRef;
+	scrollerRef: RefObject<HTMLElement>;
+	containerRef: RefObject<HTMLElement>;
 }
 
 export default function Help(props: HelpProps) {
@@ -33,10 +33,10 @@ export default function Help(props: HelpProps) {
 	const [entryHeight, setEntryHeight] = useState(0);
 
 	useEffect(() => {
-		const $scroller = scrollerRef.current;
-		const { lastChild } = containerRef.current;
-		$scroller.scrollTo(0, lastChild.offsetTop);
-		setEntryHeight(lastChild?.clientHeight || 0);
+		const $scroller = scrollerRef.current!;
+		const $lastChild = containerRef.current!.lastElementChild as HTMLElement;
+		$scroller.scrollTo(0, $lastChild!.offsetTop);
+		setEntryHeight($lastChild?.clientHeight || 0);
 	}, [scrollerRef.current, containerRef.current]);
 
 	return (

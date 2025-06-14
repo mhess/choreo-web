@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 
 import { setOnIndexChangeAtom, useEntryAtoms } from "~/lib/entries";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
@@ -99,8 +99,8 @@ const EntryHeader = () => (
 );
 
 const setEntriesScrollPosition = (
-	scrollRef: ElementRef,
-	containerRef: ElementRef,
+	scrollRef: RefObject<HTMLElement>,
+	containerRef: RefObject<HTMLElement>,
 	newIndex: number,
 ) => {
 	const $scroller = scrollRef.current;
