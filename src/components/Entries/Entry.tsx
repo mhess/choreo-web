@@ -1,9 +1,9 @@
 import { IconX } from "@tabler/icons-react";
 import { clsx } from "clsx";
-import { useAtom } from "jotai";
-import { Button } from "react-aria-components";
+import { WritableAtom, useAtom } from "jotai";
+import { ChangeEvent, ComponentProps, memo } from "react";
+import { Button, Input } from "react-aria-components";
 
-import InputWithAtom from "~/components/TextInputWithAtom";
 import { type AtomicEntry, entryAtomsForPlatformAtom } from "~/lib/entries";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { displayMs } from "~/lib/utils";
@@ -12,7 +12,10 @@ import { columnWidthStyles } from "~/styles";
 import Count from "./Count";
 import { NOTE_LABEL } from "./shared";
 
-export default function Entry(props: { entry: AtomicEntry; index: number }) {
+const delBtnStyles =
+	"p-hover:backdrop-brightness-90 rounded p-1 backdrop-brightness-95 disabled:opacity-0 dark:backdrop-brightness-110 hover:dark:backdrop-brightness-125";
+
+function Entry(props: { entry: AtomicEntry; index: number }) {
 	const { entry, index } = props;
 
 	const player = useEstablishedPlayer();
@@ -50,16 +53,13 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 				{displayTime}
 			</Button>
 			{/* TODO: in-line this component and delete the importing file */}
-			<InputWithAtom
+			<NoteInput
 				className="mr-2 min-w-0 flex-1 rounded px-2 py-0.5"
 				aria-label={NOTE_LABEL}
 				atom={noteAtom}
 			/>
 			<Button
-				className={clsx(
-					"p-hover:backdrop-brightness-90 rounded p-1 backdrop-brightness-95 disabled:opacity-0 dark:backdrop-brightness-110 hover:dark:backdrop-brightness-125",
-					!index && "cursor-default",
-				)}
+				className={clsx(delBtnStyles, !index && "cursor-default")}
 				aria-label="Delete Entry"
 				isDisabled={!index}
 				onPress={() => removeEntry(index)}
@@ -69,3 +69,20 @@ export default function Entry(props: { entry: AtomicEntry; index: number }) {
 		</div>
 	);
 }
+
+interface NoteInputProps extends ComponentProps<"input"> {
+	atom: WritableAtom<string, [string], void>;
+}
+
+const NoteInput = (props: NoteInputProps) => {
+	const { atom, ...inputProps } = props;
+	const [note, setNote] = useAtom(atom);
+
+	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setNote(e.target.value);
+	};
+
+	return <Input {...inputProps} value={note} onChange={handleChange} />;
+};
+
+export default memo(Entry);
