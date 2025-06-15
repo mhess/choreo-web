@@ -1,0 +1,15 @@
+{
+	"include": ["./api/*.ts"],
+	"compilerOptions": {
+		"target": "esnext",
+		"allowJs": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"noEmit": true,
+		"module": "nodenext",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"incremental": true,
+		"baseUrl": "./api"
+	}
+}
