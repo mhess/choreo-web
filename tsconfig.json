@@ -1,20 +1,7 @@
 {
-	"include": ["./src/**/*.ts", "./src/**/*.tsx", "*.ts"],
-	"compilerOptions": {
-		"target": "ES2022",
-		"lib": ["DOM", "DOM.Iterable", "ES2022"],
-		"isolatedModules": true,
-		"jsx": "react-jsx",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"strict": true,
-		"allowJs": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-		"baseUrl": "./src",
-		"paths": {
-			"~/*": ["./*"]
-		},
-		"noEmit": true
-	}
+	"files": [],
+	"references": [
+		{ "path": "./tsconfig.app.json" },
+		{ "path": "./tsconfig.api.json" }
+	]
 }
