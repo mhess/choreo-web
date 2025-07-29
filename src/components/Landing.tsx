@@ -1,9 +1,8 @@
-import clsx from "clsx";
 import { useAtom } from "jotai";
 import { Button } from "react-aria-components";
 
 import { platformAtom } from "~/lib/platformAtoms";
-import { tw, useIsMobile } from "~/lib/utils";
+import { tw } from "~/lib/utils";
 import { ctlBarBgStyles } from "~/styles";
 
 import { AudioFile, Spotify, YouTube } from "./Logos";
@@ -11,33 +10,33 @@ import { AudioFile, Spotify, YouTube } from "./Logos";
 const btnStyles = tw`${ctlBarBgStyles} flex items-center rounded border border-zinc-400 px-4 py-1 hover:brightness-95 dark:border-zinc-600 dark:hover:brightness-110`;
 
 export default function Landing() {
-	const isMobile = useIsMobile();
 	const [, selectPlatform] = useAtom(platformAtom);
 
 	return (
-		<div
-			className={clsx(
-				"flex w-full justify-center overflow-y-auto",
-				isMobile && "items-start pt-4",
-			)}
-		>
-			<div className="m-4 mt-8 flex w-full max-w-2xl flex-col gap-8">
-				<h3 className="text-center text-4xl font-bold">
-					Welcome to the Choreo&nbsp;App!
+		<div className="w-full overflow-y-auto">
+			<section className="flex flex-col gap-6 py-10 pb-16 text-center">
+				<h3 className="text-4xl/relaxed font-bold">
+					Welcome&nbsp;to&nbsp;the Choreo&nbsp;Web&nbsp;App
 				</h3>
-				<p className="text-center">
-					Choreo is a web app that helps you compose choreography to music.
-				</p>
-				<div className="flex flex-col gap-6 text-center">
-					<p>
-						You can use audio from <b>Youtube,</b> a <b>Spotify</b> premium
-						account, or a <b>local file</b> to set up a web player that allows
-						you to annotate time points in a track while it&apos;s playing.
-					</p>
-					<p>Use these annotations to navigate around the song easily.</p>
-					<p>Save these annotations to CSV files for later.</p>
-					<p>Give it a try!</p>
-				</div>
+				<h2 className="text-xl">Compose choreography to music easily!</h2>
+			</section>
+			<section className="flex flex-col items-center px-4 pt-10 pb-16 dark:bg-zinc-700">
+				<h1 className="mb-4 text-center text-2xl font-bold">Features</h1>
+				<ul className="flex max-w-2xl list-disc flex-col gap-4 pl-6">
+					<li>
+						Use audio from a <b>Spotify Premium account</b>, <b>YouTube</b>, or
+						a <b>local audio file</b>.
+					</li>
+					<li>
+						Annotate time points in a track while it&apos;s playing using the
+						built-in web player.
+					</li>
+					<li>Seek through a track easily using annotations.</li>
+					<li>Save annotations to CSV files for later or to share!</li>
+				</ul>
+			</section>
+			<section className="p flex flex-col items-center gap-6 py-16">
+				<p>Go ahead and give it a try!</p>
 				<div className="flex flex-wrap justify-center gap-4">
 					<Button
 						className={`${btnStyles} gap-3`}
@@ -61,7 +60,7 @@ export default function Landing() {
 						<AudioFile />
 					</Button>
 				</div>
-			</div>
+			</section>
 		</div>
 	);
 }
