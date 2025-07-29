@@ -15,12 +15,12 @@ export default function Landing() {
 	return (
 		<div className="w-full overflow-y-auto">
 			<section className="flex flex-col gap-6 py-10 pb-16 text-center">
-				<h3 className="text-4xl/relaxed font-bold">
+				<h1 className="text-4xl/relaxed font-bold">
 					Welcome&nbsp;to&nbsp;the Choreo&nbsp;Web&nbsp;App
-				</h3>
-				<h2 className="text-xl">Compose choreography to music easily!</h2>
+				</h1>
+				<h2 className="px-4 text-xl">Compose choreography to music easily!</h2>
 			</section>
-			<section className="flex flex-col items-center px-4 pt-10 pb-16 dark:bg-zinc-700">
+			<section className="flex flex-col items-center bg-zinc-200 px-4 pt-10 pb-12 dark:bg-zinc-700">
 				<h1 className="mb-4 text-center text-2xl font-bold">Features</h1>
 				<ul className="flex max-w-2xl list-disc flex-col gap-4 pl-6">
 					<li>
@@ -35,8 +35,8 @@ export default function Landing() {
 					<li>Save annotations to CSV files for later or to share!</li>
 				</ul>
 			</section>
-			<section className="p flex flex-col items-center gap-6 py-16">
-				<p>Go ahead and give it a try!</p>
+			<section className="p flex flex-col items-center gap-6 pt-12 pb-16">
+				<h2 className="text-xl">Go ahead and give it a try!</h2>
 				<div className="flex flex-wrap justify-center gap-4">
 					<Button
 						className={`${btnStyles} gap-3`}
