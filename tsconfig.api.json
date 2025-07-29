@@ -1,12 +1,13 @@
 {
 	"include": ["./api/*.ts"],
 	"compilerOptions": {
-		"target": "esnext",
+		"target": "es2022",
 		"allowJs": true,
 		"skipLibCheck": true,
 		"strict": true,
 		"noEmit": true,
-		"module": "nodenext",
+		"module": "esnext",
+		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"incremental": true,

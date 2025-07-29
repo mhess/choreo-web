@@ -15,7 +15,7 @@ const generateRandomString = (length: number) => {
 
 const scope = "streaming user-read-email user-read-private";
 
-export default async (request: Request) => {
+export async function GET(request: Request): Promise<Response> {
 	const url = new URL(request.url);
 	const protocolAndHost = `${url.protocol}//${url.host}`;
 
@@ -27,7 +27,7 @@ export default async (request: Request) => {
 		default:
 			return new Response(`Unknown path ${url.pathname}`, { status: 404 });
 	}
-};
+}
 
 const login = (protocolAndHost: string) => {
 	const state = generateRandomString(16);
