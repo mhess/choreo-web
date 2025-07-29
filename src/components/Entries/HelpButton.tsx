@@ -177,7 +177,7 @@ const SimpleHelpButton = forwardRef(function SimpleHelpButton(
 			className={clsx(helpBtnStyles, className)}
 			{...otherProps}
 		>
-			{isHelpShowing ? "Hide" : "Show"} Help
+			{isHelpShowing ? "Hide" : "Show"}&nbsp;Help
 			<IconHelp size="1.25rem" className="ml-1" />
 		</Button>
 	);

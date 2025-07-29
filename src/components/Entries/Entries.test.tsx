@@ -103,7 +103,7 @@ describe("Entries", () => {
 			expect(localStorage.getItem("helpDismissed")).toBe("t");
 
 			expect(
-				screen.getByRole("button", { name: "Show Help" }),
+				screen.getByRole("button", { name: /^Show\sHelp$/ }),
 			).toBeInTheDocument();
 
 			await user.click(screen.getByRole("button", { name: "Play" }));
@@ -139,11 +139,11 @@ describe("Entries", () => {
 		it('Can show help from "First time" dialog', async () => {
 			await arrangeFirstVisit();
 
-			await user.click(screen.getByRole("button", { name: "Show Help" }));
+			await user.click(screen.getByRole("button", { name: /^Show\sHelp$/ }));
 
 			expect(screen.getByTestId("help")).toBeInTheDocument();
 
-			await user.click(screen.getByRole("button", { name: "Hide Help" }));
+			await user.click(screen.getByRole("button", { name: /^Hide\sHelp$/ }));
 
 			expect(screen.queryByTestId("help")).not.toBeInTheDocument();
 
@@ -497,16 +497,16 @@ describe("Entries", () => {
 			]);
 		});
 
-		it(`Renders/hides help content when the "Help" button is clicked`, async () => {
+		it('Toggles help content when the "Help" button is clicked', async () => {
 			arrange();
 
 			expect(screen.queryByTestId("help")).not.toBeInTheDocument();
 
-			await user.click(screen.getByRole("button", { name: "Show Help" }));
+			await user.click(screen.getByRole("button", { name: /^Show\sHelp$/ }));
 
 			expect(screen.getByTestId("help")).toBeInTheDocument();
 
-			await user.click(screen.getByRole("button", { name: "Hide Help" }));
+			await user.click(screen.getByRole("button", { name: /^Hide\sHelp$/ }));
 
 			expect(screen.queryByTestId("help")).not.toBeInTheDocument();
 		});
