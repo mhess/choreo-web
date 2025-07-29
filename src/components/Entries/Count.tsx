@@ -146,6 +146,7 @@ const FillRest = (props: FillRestProps) => {
 								</p>
 								<div className="flex justify-end gap-4">
 									<Button
+										autoFocus
 										className={actionBtnStyles}
 										onPress={handlePressFillRest(close)}
 									>
