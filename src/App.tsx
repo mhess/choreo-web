@@ -19,7 +19,7 @@ window.store = store;
 export default function App() {
 	return (
 		<JotaiProvider store={store}>
-			<DevTools store={store} />
+			<DevTools store={store} position="bottom-right" />
 			<BreakpointProvider>
 				<Header />
 				<PlatformRouter />
