@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
 
-import { spotifyTokenParam } from "../shared.js";
+const spotifyTokenParam = "spotifyToken";
 
 const generateRandomString = (length: number) => {
 	let text = "";
