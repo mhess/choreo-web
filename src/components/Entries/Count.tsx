@@ -60,7 +60,7 @@ export default function Count(props: CountInputProps) {
 
 	return (
 		<div
-			className="relative"
+			className="relative z-10"
 			onBlurCapture={handleBlurCapture}
 			onFocusCapture={handleFocusCapture}
 		>
