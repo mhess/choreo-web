@@ -44,28 +44,39 @@ function Entry(props: { entry: AtomicEntry; index: number }) {
 					: "bg-zinc-300 odd:bg-zinc-400 dark:bg-zinc-800 dark:odd:bg-zinc-900",
 			)}
 		>
-			<Count countAtom={countAtom} canFillAtom={countFillAtom} index={index} />
-			<Button
-				aria-label={`Seek to ${displayTime}`}
-				className={`${columnWidthStyles.timestamp} px-4 py-2 text-right hover:text-blue-400`}
-				onPress={() => player.seekTo(timeMs)}
-			>
-				{displayTime}
-			</Button>
-			{/* TODO: in-line this component and delete the importing file */}
-			<NoteInput
-				className="mr-2 min-w-0 flex-1 rounded px-2 py-0.5"
-				aria-label={NOTE_LABEL}
-				atom={noteAtom}
-			/>
-			<Button
-				className={clsx(delBtnStyles, !index && "cursor-default")}
-				aria-label="Delete Entry"
-				isDisabled={!index}
-				onPress={() => removeEntry(index)}
-			>
-				<IconX size="1rem" />
-			</Button>
+			<span role="gridcell">
+				<Count
+					countAtom={countAtom}
+					canFillAtom={countFillAtom}
+					index={index}
+				/>
+			</span>
+			<span role="gridcell" className={columnWidthStyles.timestamp}>
+				<Button
+					aria-label={`Seek to ${displayTime}`}
+					className="w-full px-4 py-2 text-right hover:text-blue-400"
+					onPress={() => player.seekTo(timeMs)}
+				>
+					{displayTime}
+				</Button>
+			</span>
+			<span role="gridcell">
+				<NoteInput
+					className="mr-2 min-w-0 flex-1 rounded px-2 py-0.5"
+					aria-label={NOTE_LABEL}
+					atom={noteAtom}
+				/>
+			</span>
+			<span role="gridcell">
+				<Button
+					className={clsx(delBtnStyles, !index && "cursor-default")}
+					aria-label="Delete Entry"
+					isDisabled={!index}
+					onPress={() => removeEntry(index)}
+				>
+					<IconX size="1rem" />
+				</Button>
+			</span>
 		</div>
 	);
 }
