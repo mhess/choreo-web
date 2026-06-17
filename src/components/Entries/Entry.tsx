@@ -113,7 +113,7 @@ const Progress = (props: { index: number; timeMs: number }) => {
 	return (
 		<div
 			style={{ width: `${progress}%` }}
-			className="absolute top-0 left-0 h-full backdrop-brightness-70"
+			className="pointer-events-none absolute top-0 left-0 h-full backdrop-brightness-70"
 		/>
 	);
 };
