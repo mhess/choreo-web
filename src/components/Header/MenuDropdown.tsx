@@ -9,7 +9,7 @@ import { platformAtom, playerAtom, trackNameAtom } from "~/lib/platformAtoms";
 import { useColorScheme, useIsMobile } from "~/lib/utils";
 import { audioFileAtom } from "~/platforms/audioFile";
 import { spotifyAuthAtom } from "~/platforms/spotify";
-import { resetVideoAtom } from "~/platforms/youtube";
+import { ytVideoIdAtom } from "~/platforms/youtube";
 import { menuStyles } from "~/styles";
 
 import PlatformItems from "./PlatformItems";
@@ -22,7 +22,7 @@ export default function MenuDropdown() {
 	const [, saveToCSV] = useAtom(saveToCSVAtom);
 	const [, loadFromCSV] = useAtom(loadFromCSVAtom);
 
-	const [, resetYtVideo] = useAtom(resetVideoAtom);
+	const [, resetYtVideo] = useAtom(ytVideoIdAtom);
 	const [isSpotifyLoggedIn, logoutSpotify] = useAtom(spotifyAuthAtom);
 	const [, setAudioFile] = useAtom(audioFileAtom);
 

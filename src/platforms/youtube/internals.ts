@@ -1,4 +1,5 @@
 import { type PrimitiveAtom, atom, useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 import { useEffect } from "react";
 
 import { PlatformPlayer, getPlatformAtoms } from "~/lib/player";
@@ -30,11 +31,10 @@ const writePausedAtom = atom(null, (_, set, paused: boolean) =>
 	set(pausedAtom, paused),
 );
 
-const YT_KEY_LS_KEY = "yt-video-id";
-export const resetVideoAtom = atom(null, (_, set) => {
-	set(statusAtom, YouTubePlayerStatus.LOADED);
-	localStorage.removeItem(YT_KEY_LS_KEY);
-});
+interface VideoData {
+	savedVideoId: string | null;
+	recents: [string, string][];
+}
 
 const videoDataAtom = atom((get) => {
 	const player = get(playerAtom);
@@ -51,12 +51,72 @@ export const atoms = getPlatformAtoms({
 	trackName: (get) => get(videoDataAtom)?.title || "",
 });
 
+const YT_VIDEOS_LS_KEY = "yt-video-data";
+const ytVideosAtom = atomWithStorage<VideoData>(YT_VIDEOS_LS_KEY, {
+	savedVideoId: null,
+	recents: [
+		["foo", "foo name"],
+		["baz", "baz name"],
+		["oof", "oof name"],
+		["zab", "zab name"],
+		["top", "top name"],
+		["cat", "cat name"],
+		["rat", "rat name"],
+		["foo2", "foo name"],
+		["baz2", "baz2 name"],
+		["oof2", "oof2 name"],
+		["zab2", "zab2 name"],
+		["top2", "top2 name"],
+		["cat2", "cat2 name"],
+		["rat2", "rat2 name"],
+	],
+});
+
+const recentVideosAtom = atom(
+	(get) => get(ytVideosAtom).recents,
+	(get, set, removeId: string) => {
+		const { recents } = get(ytVideosAtom);
+		const removeIndex = recents.findIndex(([id]) => id === removeId);
+		if (removeIndex < 0) return;
+		const newRecents = [...recents];
+		newRecents.splice(removeIndex, 1);
+		set(ytVideosAtom, { ...get(ytVideosAtom), recents: newRecents });
+	},
+);
+
+export const ytVideoIdAtom = atom(
+	(get) => get(ytVideosAtom).savedVideoId,
+	(get, set, videoId?: string) => {
+		set(statusAtom, YouTubePlayerStatus[videoId ? "READY" : "LOADED"]);
+		const { recents } = get(ytVideosAtom);
+		let newVideos: VideoData;
+
+		if (videoId) {
+			const newRecents = [...recents];
+			const existingIndex = recents.findIndex((el) => el[0] === videoId);
+			if (existingIndex > 0) {
+				newRecents.unshift(...newRecents.splice(existingIndex, 1));
+			} else if (existingIndex === -1) {
+				const artist = get(atoms.artistAtom);
+				newRecents.unshift([
+					videoId,
+					(artist && `${artist}: `) + get(atoms.trackNameAtom),
+				]);
+			}
+			newVideos = { recents: newRecents, savedVideoId: videoId };
+		} else newVideos = { recents, savedVideoId: null };
+
+		set(ytVideosAtom, newVideos);
+	},
+);
+
 export const YT_PLAYER_EL_ID = "ytplayer";
 const YT_SCRIPT_ID = "yt-api-script";
 
 const getYouTubePlayer = async (
 	setPaused: (paused: boolean) => void,
 	setStatus: (status: YouTubePlayerStatus) => void,
+	setVideoId: (videoId: string) => void,
 ): Promise<YouTubePlayer> => {
 	if (!document.getElementById(YT_SCRIPT_ID)) {
 		const $player = document.createElement("div");
@@ -78,7 +138,7 @@ const getYouTubePlayer = async (
 				playerVars: { playsinline: 1 },
 				events: {
 					onReady: () =>
-						resolve(new YouTubePlayer(player, setPaused, setStatus)),
+						resolve(new YouTubePlayer(player, setPaused, setVideoId)),
 					onError: (e) => {
 						if (BAD_ID_ERR_CODES.has(e.data)) {
 							setStatus(YouTubePlayerStatus.BAD_ID);
@@ -98,7 +158,7 @@ class YouTubePlayer extends PlatformPlayer {
 	constructor(
 		ytPlayer: YT.Player,
 		setPaused: (paused: boolean) => void,
-		setStatus: (status: YouTubePlayerStatus) => void,
+		setVideoId: (videoId: string) => void,
 	) {
 		super();
 
@@ -109,8 +169,7 @@ class YouTubePlayer extends PlatformPlayer {
 			setPaused(isPaused);
 
 			if (state === YT.PlayerState.CUED) {
-				localStorage.setItem(YT_KEY_LS_KEY, ytPlayer.getVideoData().video_id);
-				setStatus(YouTubePlayerStatus.READY);
+				setVideoId(ytPlayer.getVideoData().video_id);
 			}
 
 			this._onPlaybackChange(isPaused);
@@ -166,17 +225,20 @@ export const useYouTubePlayer = () => {
 	const [player, setPlayer] = useAtom(playerAtom);
 	const [status, setStatus] = useAtom(statusAtom);
 	const [, setPaused] = useAtom(writePausedAtom);
+	const [savedVideoId, setVideoId] = useAtom(ytVideoIdAtom);
 
 	useEffect(() => {
 		if (!window.ytPlayerPromise)
-			window.ytPlayerPromise = getYouTubePlayer(setPaused, setStatus);
+			window.ytPlayerPromise = getYouTubePlayer(
+				setPaused,
+				setStatus,
+				setVideoId,
+			);
 		window.ytPlayerPromise.then(setPlayer);
 	}, [setPlayer, setPaused, setStatus]);
 
 	useEffect(() => {
 		if (player) {
-			const savedVideoId = localStorage.getItem(YT_KEY_LS_KEY);
-
 			if (savedVideoId) {
 				if (status !== YouTubePlayerStatus.READY) cueVideo(savedVideoId);
 			} else setStatus(YouTubePlayerStatus.LOADED);
@@ -190,5 +252,5 @@ export const useYouTubePlayer = () => {
 		player?.ytPlayer.cueVideoById(videoId);
 	};
 
-	return { status, cueVideo };
+	return { status, cueVideo, recentsAtom: recentVideosAtom };
 };
