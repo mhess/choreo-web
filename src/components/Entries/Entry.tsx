@@ -14,7 +14,7 @@ import Count from "./Count";
 import { NOTE_LABEL } from "./shared";
 
 const delBtnStyles =
-	"p-hover:backdrop-brightness-90 rounded p-1 backdrop-brightness-95 disabled:opacity-0 dark:backdrop-brightness-110 hover:dark:backdrop-brightness-125 z-10";
+	"p-hover:backdrop-brightness-90 rounded p-1 backdrop-brightness-95 disabled:opacity-0 dark:backdrop-brightness-110 hover:dark:backdrop-brightness-125";
 
 function Entry(props: { entry: AtomicEntry; index: number }) {
 	const { entry, index } = props;
@@ -39,35 +39,42 @@ function Entry(props: { entry: AtomicEntry; index: number }) {
 		<div
 			role="row"
 			className={clsx(
-				"relative flex items-center pr-2 pl-4",
+				"relative pr-2 pl-4",
 				isCurrent
 					? "bg-orange-300 dark:bg-yellow-700"
 					: "bg-zinc-300 odd:bg-zinc-400 dark:bg-zinc-800 dark:odd:bg-zinc-900",
 			)}
 		>
-			<Count countAtom={countAtom} canFillAtom={countFillAtom} index={index} />
-			<Button
-				aria-label={`Seek to ${displayTime}`}
-				className={`${columnWidthStyles.timestamp} z-10 px-4 py-2 text-right hover:text-blue-400`}
-				onPress={() => player.seekTo(timeMs)}
-			>
-				{displayTime}
-			</Button>
-			{/* TODO: in-line this component and delete the importing file */}
-			<NoteInput
-				className="z-10 mr-2 min-w-0 flex-1 rounded px-2 py-0.5"
-				aria-label={NOTE_LABEL}
-				atom={noteAtom}
-			/>
-			<Button
-				className={clsx(delBtnStyles, !index && "cursor-default")}
-				aria-label="Delete Entry"
-				isDisabled={!index}
-				onPress={() => removeEntry(index)}
-			>
-				<IconX size="1rem" />
-			</Button>
 			{isCurrent ? <Progress index={index} timeMs={timeMs} /> : null}
+			<div className="flex items-center">
+				<Count
+					countAtom={countAtom}
+					canFillAtom={countFillAtom}
+					index={index}
+				/>
+				<Button
+					aria-label={`Seek to ${displayTime}`}
+					className={`${columnWidthStyles.timestamp} px-4 py-2 text-right hover:text-blue-400`}
+					onPress={() => player.seekTo(timeMs)}
+				>
+					{displayTime}
+				</Button>
+				{/* TODO: in-line this component and delete the importing file */}
+				<NoteInput
+					id={`note-${index}`}
+					className="mr-2 min-w-0 flex-1 rounded px-2 py-0.5"
+					aria-label={`${NOTE_LABEL} for entry ${index + 1}`}
+					atom={noteAtom}
+				/>
+				<Button
+					className={clsx(delBtnStyles, !index && "cursor-default")}
+					aria-label="Delete Entry"
+					isDisabled={!index}
+					onPress={() => removeEntry(index)}
+				>
+					<IconX size="1rem" />
+				</Button>
+			</div>
 		</div>
 	);
 }

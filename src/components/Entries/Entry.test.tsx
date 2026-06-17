@@ -81,7 +81,7 @@ describe("Entry", () => {
 			screen.getByRole("button", { name: "Seek to 0:12.34" }),
 		).toBeInTheDocument();
 
-		expect(screen.getByLabelText("Note")).toHaveValue("Note");
+		expect(screen.getByLabelText("Note for entry 1")).toHaveValue("Note");
 
 		expect(
 			screen.queryByRole("button", {
@@ -138,7 +138,7 @@ describe("Entry", () => {
 		arrange([exampleEntry], 0);
 
 		const newValue = "New note";
-		const noteInput = screen.getByLabelText("Note");
+		const noteInput = screen.getByLabelText("Note for entry 1");
 		await user.clear(noteInput);
 		await user.type(noteInput, newValue);
 
