@@ -14,6 +14,7 @@ export type Entry = {
 export type AtomicEntry = {
 	countAtom: WritableAtom<number, [number, number, boolean?], void>;
 	timeMs: number;
+	loopAtom: WritableAtom<number, [number], void>;
 	noteAtom: PrimitiveAtom<string>;
 	isCurrentAtom: PrimitiveAtom<boolean>;
 	canFillAtom: PrimitiveAtom<boolean>;
@@ -26,18 +27,14 @@ type PlatformEntryAtoms = {
 	removeAtom: WritableAtom<null, [number], void>;
 	clearAtom: WritableAtom<null, [], void>;
 	fillCountsAtom: WritableAtom<null, [number], void>;
-	currentIndexAtom: WritableAtom<null, [number], void>;
+	currentIndexAtom: WritableAtom<
+		null,
+		[number, boolean],
+		[number | null, number | null]
+	>;
 	saveToCSVAtom: WritableAtom<null, [string], void>;
 	loadFromCSVAtom: WritableAtom<null, [File], Promise<void>>;
 };
-
-type ScrollCallback = (currentIndex: number) => void;
-
-// Function is wrapped in array here bc jotai doesn't support functions as values
-const onIndexChangeAtom = atom<[ScrollCallback]>();
-export const setOnIndexChangeAtom = atom(null, (_, set, cb: ScrollCallback) =>
-	set(onIndexChangeAtom, [cb]),
-);
 
 export const useEntryAtoms = () => {
 	const [platformEntryAtoms] = useAtom(entryAtomsForPlatformAtom);
@@ -57,25 +54,18 @@ export const entryAtomsForPlatformAtom = atom(
 	(get) => entryAtomsByPlatform[get(platformAtom)],
 );
 
-declare global {
-	interface Window {
-		atoms: Record<
-			Platform,
-			{
-				currentIsCurrentAtomAtom: PrimitiveAtom<PrimitiveAtom<boolean>>;
-			}
-		>;
-	}
-}
+// declare global {
+// 	interface Window {
+// 		atoms: Record<Platform, {}>;
+// 	}
+// }
+// window.atoms = {} as Window["atoms"];
 
-window.atoms = {} as Window["atoms"];
-
-const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
-	const currentIsCurrentAtomAtom = atom(atom(false) as PrimitiveAtom<boolean>);
-
+const createPlatformEntryAtoms = (): PlatformEntryAtoms => {
 	// For debugging. Since these atoms are never passed to the useAtom() hook,
 	// the only way to see their values is to put them on the window.
-	window.atoms[platform] = { currentIsCurrentAtomAtom };
+	// window.atoms[platform] = {};
+	const currentEntryAtom = atom<AtomicEntry | null>(null);
 
 	const entriesSrcAtom = atom<AtomicEntry[]>([]);
 
@@ -149,19 +139,38 @@ const createPlatformEntryAtoms = (platform: Platform): PlatformEntryAtoms => {
 	//			 as the first word
 	const currentIndexAtom = atom(
 		null,
-		(get: Getter, set: Setter, timeMs: number) => {
+		(
+			get: Getter,
+			set: Setter,
+			timeMs: number,
+			isSeek: boolean,
+		): [number | null, number | null] => {
 			const entries = get(entriesAtom);
-			const index = findHighlightIndex(entries, timeMs);
+			const prevEntry = get(currentEntryAtom);
 
-			const nextEntry = entries[index];
-			const currentIsCurrentAtom = get(currentIsCurrentAtomAtom);
+			let nextIndex = findHighlightIndex(entries, timeMs);
+			let nextEntry = entries[nextIndex];
 
-			if (nextEntry.isCurrentAtom === currentIsCurrentAtom) return;
+			// Still in same entry
+			if (nextEntry === prevEntry) return [null, null];
 
-			(get(onIndexChangeAtom) as [ScrollCallback])[0](index);
-			set(currentIsCurrentAtom, false);
-			set(nextEntry.isCurrentAtom, true);
-			set(currentIsCurrentAtomAtom, nextEntry.isCurrentAtom);
+			const loopState = prevEntry ? get(prevEntry.loopAtom) : 0;
+
+			if (isSeek || loopState === 0 || loopState === 1) {
+				if (prevEntry) set(prevEntry.isCurrentAtom, false);
+				set(nextEntry.isCurrentAtom, true);
+				set(currentEntryAtom, nextEntry);
+				return [nextIndex, null];
+			}
+
+			if (loopState === 3) return [null, prevEntry!.timeMs];
+
+			// loopState === 2
+			do {
+				nextEntry = entries[--nextIndex];
+				if (get(nextEntry.loopAtom) === 1) break;
+			} while (nextIndex);
+			return [null, nextEntry.timeMs];
 		},
 	);
 
@@ -214,10 +223,20 @@ const getAtomicEntryMaker =
 				}
 			},
 		);
+		const loopSrcAtom = atom(0);
+		const loopAtom = atom(
+			(get) => get(loopSrcAtom),
+			(get, set, entryIndex: number) => {
+				let nextState = (get(loopSrcAtom) + 1) % 4;
+				if (!entryIndex && nextState === 2) nextState = 3;
+				set(loopSrcAtom, nextState);
+			},
+		);
 
 		return {
 			countAtom,
 			timeMs: entry.timeMs,
+			loopAtom,
 			noteAtom: atom(entry.note || ""),
 			isCurrentAtom: atom(entry.isCurrent || false),
 			canFillAtom,
@@ -226,7 +245,7 @@ const getAtomicEntryMaker =
 
 const entryAtomsByPlatform = platforms.reduce(
 	(entriesByPlatform, platform) => {
-		entriesByPlatform[platform] = createPlatformEntryAtoms(platform);
+		entriesByPlatform[platform] = createPlatformEntryAtoms();
 		return entriesByPlatform;
 	},
 	{} as Record<Platform, PlatformEntryAtoms>,

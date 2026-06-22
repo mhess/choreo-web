@@ -50,6 +50,10 @@ describe("Entries", () => {
 		player = {
 			pause: vi.fn(pauseImpl).mockResolvedValueOnce(),
 			addOnTick: vi.fn(),
+			getCurrentTime: vi
+				.fn(getCurrentTimeImpl)
+				.mockResolvedValueOnce(0)
+				.mockResolvedValueOnce(0),
 			removeOnTick: vi.fn(),
 		} as unknown as PlatformPlayer;
 
@@ -64,9 +68,7 @@ describe("Entries", () => {
 
 	const tickToTime = (timeMs: number) =>
 		act(async () => {
-			player.getCurrentTime = vi
-				.fn(getCurrentTimeImpl)
-				.mockResolvedValueOnce(timeMs);
+			(player.getCurrentTime as Mock).mockResolvedValueOnce(timeMs);
 
 			for (const call of (player.addOnTick as Mock).mock.calls)
 				await call[0](timeMs);
@@ -524,7 +526,13 @@ describe("Entries", () => {
 		it("Preserves the existing entries when remounted", async () => {
 			const { unmount } = arrange([{ timeMs: 0, count: 1 }]);
 
+			(player.pause as Mock<typeof pauseImpl>).mockResolvedValueOnce();
+
 			await act(async () => unmount());
+
+			(player.getCurrentTime as Mock)
+				.mockResolvedValueOnce(0)
+				.mockResolvedValueOnce(0);
 
 			arrange(false);
 
@@ -533,11 +541,9 @@ describe("Entries", () => {
 					timeMs: 0,
 					count: 1,
 					index: 0,
-					isCurrent: false,
+					isCurrent: true,
 				},
 			]);
-
-			(player.pause as Mock<typeof pauseImpl>).mockResolvedValueOnce();
 		});
 	});
 });

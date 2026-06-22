@@ -118,10 +118,12 @@ class YouTubePlayer extends PlatformPlayer {
 	}
 
 	async play() {
+		this._onPlaybackChange(false);
 		this.ytPlayer.playVideo();
 	}
 
 	async pause() {
+		this._onPlaybackChange(true);
 		this.ytPlayer.pauseVideo();
 	}
 
@@ -129,7 +131,7 @@ class YouTubePlayer extends PlatformPlayer {
 		const posMs = ms < 0 ? 0 : ms;
 		// @ts-expect-error: seekTo() call with 2 args seems to break the player
 		this.ytPlayer.seekTo(posMs / 1000);
-		this._tick(posMs);
+		this._tick(posMs, true);
 	}
 
 	async getCurrentTime() {

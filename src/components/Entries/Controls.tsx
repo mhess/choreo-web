@@ -13,7 +13,6 @@ import { Button } from "react-aria-components";
 import TooltipWithClick from "~/components/TooltipWithClick";
 import { entryAtomsForPlatformAtom } from "~/lib/entries";
 import { playerPausedAtom, useEstablishedPlayer } from "~/lib/platformAtoms";
-import type { OnTickCallback } from "~/lib/player";
 import { displayMs, tw, useIsMobile } from "~/lib/utils";
 import { ctlBarStyles } from "~/styles";
 
@@ -69,8 +68,9 @@ const TrackTime = () => {
 	const player = useEstablishedPlayer();
 
 	useEffect(() => {
-		const cb: OnTickCallback = (ms) => setTimeMs(ms);
+		const cb = (ms: number) => setTimeMs(ms);
 		player.addOnTick(cb);
+		player.getCurrentTime().then(cb);
 		return () => player.removeOnTick(cb);
 	}, [player]);
 

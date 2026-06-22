@@ -89,9 +89,9 @@ class AudioFilePlayer extends PlatformPlayer {
 		this.$audioEl.pause();
 	}
 
-	seekTo(ms: number) {
+	async seekTo(ms: number) {
 		this.$audioEl.currentTime = ms / 1000;
-		this._tick(ms);
+		await this._tick(ms, true);
 	}
 
 	async getCurrentTime() {

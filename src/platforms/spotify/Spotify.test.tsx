@@ -231,9 +231,7 @@ describe("Spotify", () => {
 
 		const tickMock = vi.fn();
 
-		await player.addOnTick(tickMock);
-		expect(tickMock).toHaveBeenCalledOnce();
-		expect(tickMock).toHaveBeenCalledWith(0);
+		player.addOnTick(tickMock);
 
 		await player.play();
 
@@ -245,8 +243,8 @@ describe("Spotify", () => {
 
 		await act(() => vi.advanceTimersByTime(50));
 
-		expect(tickMock).toHaveBeenCalledTimes(2);
-		expect(tickMock).toHaveBeenLastCalledWith(100);
+		expect(tickMock).toHaveBeenCalledTimes(1);
+		expect(tickMock).toHaveBeenLastCalledWith(100, false);
 
 		expect(await player.getCurrentTime()).toEqual(100);
 
@@ -258,14 +256,14 @@ describe("Spotify", () => {
 
 		await act(() => vi.advanceTimersByTime(100));
 
-		expect(tickMock).toHaveBeenCalledTimes(2);
+		expect(tickMock).toHaveBeenCalledTimes(1);
 
 		await act(async () => player.seekTo(1000));
 
 		expect(await player.getCurrentTime()).toEqual(1000);
 
-		expect(tickMock).toHaveBeenCalledTimes(3);
-		expect(tickMock).toHaveBeenLastCalledWith(1000);
+		expect(tickMock).toHaveBeenCalledTimes(2);
+		expect(tickMock).toHaveBeenLastCalledWith(1000, true);
 	};
 
 	it("Renders loading screens, entries, and creates player with token from params", async () => {

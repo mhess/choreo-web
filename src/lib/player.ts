@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import type { Atom, Getter, Setter, WritableAtom } from "jotai";
 
-export type OnTickCallback = (ms: number) => void;
+export type OnTickCallback = (ms: number, isSeek: boolean) => void;
 
 export abstract class PlatformPlayer {
 	_onTickCallbacks: OnTickCallback[] = [];
@@ -18,28 +18,28 @@ export abstract class PlatformPlayer {
 		}
 	}
 
-	async _tick(ms?: number) {
+	async _tick(ms?: number, isSeek = false) {
 		const timeMs = ms !== undefined ? ms : await this.getCurrentTime();
-		for (const cb of this._onTickCallbacks) cb(timeMs);
+		for (const cb of this._onTickCallbacks) cb(timeMs, isSeek);
 	}
 
 	abstract play(): Promise<void>;
 
 	abstract pause(): Promise<void>;
 
-	abstract seekTo(ms: number): void;
+	abstract seekTo(ms: number): Promise<void>;
 
 	abstract getCurrentTime(): Promise<number>;
 
-	async addOnTick(cb: OnTickCallback) {
-		cb(await this.getCurrentTime());
+	addOnTick(cb: OnTickCallback) {
 		this._onTickCallbacks.push(cb);
 	}
 
 	removeOnTick(callback: OnTickCallback) {
-		if (!this._onTickCallbacks.length) return;
-		const index = this._onTickCallbacks.findIndex((cb) => cb === callback);
-		if (index > -1) this._onTickCallbacks.splice(index, 1);
+		if (this._onTickCallbacks.length) {
+			const index = this._onTickCallbacks.findIndex((cb) => cb === callback);
+			if (index > -1) this._onTickCallbacks.splice(index, 1);
+		}
 	}
 }
 

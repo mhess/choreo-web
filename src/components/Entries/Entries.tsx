@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import { type RefObject, useEffect, useRef, useState } from "react";
 
-import { setOnIndexChangeAtom, useEntryAtoms } from "~/lib/entries";
+import { useEntryAtoms } from "~/lib/entries";
 import { useEstablishedPlayer } from "~/lib/platformAtoms";
 import { tw } from "~/lib/utils";
 import { columnWidthStyles } from "~/styles";
@@ -19,7 +19,6 @@ export default function Entries() {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	const { entriesAtom, currentIndexAtom } = useEntryAtoms();
-	const [, setCallback] = useAtom(setOnIndexChangeAtom);
 	const [, setCurrentIndexForTime] = useAtom(currentIndexAtom);
 	const [entries] = useAtom(entriesAtom);
 
@@ -27,17 +26,21 @@ export default function Entries() {
 	const toggle = () => setIsHelpOpen((prev) => !prev);
 
 	useEffect(() => {
-		setCallback((index) =>
-			setEntriesScrollPosition(scrollerRef, containerRef, index),
-		);
+		const onTickCallback = async (timeMs: number, isSeek = false) => {
+			const [nextIndex, nextMs] = setCurrentIndexForTime(timeMs, isSeek);
+			if (nextIndex !== null)
+				setEntriesScrollPosition(scrollerRef, containerRef, nextIndex);
+			else if (nextMs !== null) player.seekTo(nextMs);
+		};
 
-		player.addOnTick(setCurrentIndexForTime);
+		player.addOnTick(onTickCallback);
+		player.getCurrentTime().then(onTickCallback);
 
 		return () => {
-			player.removeOnTick(setCurrentIndexForTime);
+			player.removeOnTick(onTickCallback);
 			player.pause();
 		};
-	}, [player, setCallback, setCurrentIndexForTime]);
+	}, [player]);
 
 	return (
 		<>
@@ -85,9 +88,9 @@ const timestampStyles = clsx(
 const noteStyles = clsx(textStyles, "ml-3");
 
 const EntryHeader = () => (
-	<div role="row" className="flex py-2 pl-4 lowercase">
+	<div role="row" className="flex py-2 pl-2 lowercase">
 		<span role="columnheader" className={countStyles}>
-			{COUNT_LABEL}
+			<span className="relative -left-1">{COUNT_LABEL}</span>
 		</span>
 		<span role="columnheader" className={timestampStyles}>
 			Timestamp

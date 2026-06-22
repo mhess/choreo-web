@@ -195,7 +195,7 @@ class SpotifyPlayer extends PlatformPlayer {
 
 	async seekTo(ms: number) {
 		await this.spPlayer.seek(ms);
-		this._tick(ms);
+		await this._tick(ms, true);
 	}
 
 	async getCurrentTime() {
